@@ -152,7 +152,7 @@ class mainViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     //跳转到推荐界面
     @IBAction func hun_Click(_ sender: UIButton) {
-        self.performSegue(withIdentifier: "myHun", sender: self)
+        self.performSegue(withIdentifier: "showCustomView", sender: self)
         
     }
     //跳转到个人信息界面
@@ -192,8 +192,8 @@ class mainViewController: UIViewController, UITableViewDelegate, UITableViewData
                 a.user = self.user
             }
         }
-        if segue.identifier == "myHun"{
-            if let a = segue.destination as? WaitViewController{
+        if segue.identifier == "showCostumView"{
+            if let a = segue.destination as? CustomInputViewController{
                 a.user = self.user
                 
             }
@@ -258,6 +258,10 @@ class mainViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     @IBAction func showDetailHistory(_ sender: Any) {
         self.performSegue(withIdentifier: "showDetailHistory", sender: self.user)
+    }
+    //清空历史记录
+    @IBAction func deleteHistory(_ sender: Any) {
+        
     }
 }
 

@@ -9,7 +9,7 @@
 import UIKit
 
 class CustomInputViewController: UIViewController,UIPickerViewDelegate,UIPickerViewDataSource{
-    
+    var user:User!
     var selfpickerView: UIPickerView!
     var myImage: UIImageView!
     override func viewDidLoad() {
@@ -30,16 +30,16 @@ class CustomInputViewController: UIViewController,UIPickerViewDelegate,UIPickerV
         self.view.addSubview(selfpickerView)
         
         //建立一个按钮
-        let button_1 = UIButton(frame:CGRect(x:130, y:530, width:118, height:40))
-        button_1.backgroundColor = UIColor.blue
-        button_1.setTitle("确定",for:.normal)
-        button_1.addTarget(self, action:#selector(self.getPickerViewValue),
+        let startbtn = UIButton(frame:CGRect(x:130, y:530, width:118, height:40))
+        startbtn.backgroundColor = UIColor.blue
+        startbtn.setTitle("确定",for:.normal)
+        startbtn.addTarget(self, action:#selector(self.getPickerViewValue),
                            for: .touchUpInside)
-        button_1.layer.borderColor = UIColor.white.cgColor
-        button_1.layer.borderWidth = 2
-        button_1.layer.cornerRadius = 12;
+        startbtn.layer.borderColor = UIColor.white.cgColor
+        startbtn.layer.borderWidth = 2
+        startbtn.layer.cornerRadius = 12;
         self.view.addSubview(myImage)
-        self.view.addSubview(button_1)
+        self.view.addSubview(startbtn)
     }
     //设置列数
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
@@ -94,6 +94,21 @@ class CustomInputViewController: UIViewController,UIPickerViewDelegate,UIPickerV
         else{
             //没带手机---加量
         }
-        
+        self.performSegue(withIdentifier: "enterRecommand", sender: self.user)
+    }
+    @IBAction func customBack(_ sender: Any) {
+        self.performSegue(withIdentifier: "customBack", sender: self.user)
+    }
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "enterRecommand"{
+            if let a = segue.destination as? WaitViewController{
+                a.user = sender as! User
+            }
+        }
+        if segue.identifier == "customBack"{
+            if let a = segue.destination as? mainViewController{
+                a.user = sender as? User
+            }
+        }
     }
 }

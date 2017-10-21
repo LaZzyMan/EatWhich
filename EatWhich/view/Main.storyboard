@@ -589,6 +589,16 @@
                                             <action selector="showDetailHistory:" destination="CqI-6Q-JEL" eventType="touchUpInside" id="DFI-ic-jis"/>
                                         </connections>
                                     </button>
+                                    <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="F2Y-pj-zXB">
+                                        <rect key="frame" x="238" y="636" width="62" height="30"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <state key="normal" title="清空历史">
+                                            <color key="titleColor" red="0.0" green="0.56284224989999998" blue="0.31881666180000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="deleteHistory:" destination="CqI-6Q-JEL" eventType="touchUpInside" id="xLX-jc-l1e"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
@@ -614,10 +624,10 @@
                         <segue destination="BYZ-38-t0r" kind="modal" identifier="toLogin_1" id="6lM-kg-mek"/>
                         <segue destination="qbe-8D-0E1" kind="modal" identifier="toHealth_1" id="vkZ-2W-FJx"/>
                         <segue destination="0lp-Gc-jcZ" kind="modal" identifier="toHelp_1" id="OAo-d9-OaD"/>
-                        <segue destination="em5-7g-2Df" kind="modal" identifier="myHun" id="XDD-s2-wsW"/>
                         <segue destination="JC3-Gw-tlc" kind="modal" identifier="toSupper" id="O4u-Dq-cFQ"/>
                         <segue destination="n0K-Ya-VcY" kind="modal" identifier="detailHistoryBack" id="waO-fb-Pjm"/>
                         <segue destination="RlN-AU-Hik" kind="modal" identifier="showHistory" id="AiS-9h-ZO6"/>
+                        <segue destination="gfH-Ub-rHx" kind="modal" identifier="showCustomView" id="jxI-XQ-Fc6"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8UC-O2-ytT" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -847,7 +857,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
                             <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="gP9-kq-wne">
-                                <rect key="frame" x="16" y="20" width="20" height="30"/>
+                                <rect key="frame" x="16" y="20" width="21" height="35"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                 <state key="normal" backgroundImage="return"/>
@@ -1880,6 +1890,34 @@
             </objects>
             <point key="canvasLocation" x="2430.5" y="1371.5"/>
         </scene>
+        <!--Custom Input View Controller-->
+        <scene sceneID="Pgz-yl-LFr">
+            <objects>
+                <viewController id="gfH-Ub-rHx" customClass="CustomInputViewController" customModule="EatWhich" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="TKi-Of-mAx">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="oEZ-JJ-CVd">
+                                <rect key="frame" x="16" y="11" width="21" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" image="return"/>
+                                <connections>
+                                    <action selector="customBack:" destination="gfH-Ub-rHx" eventType="touchUpInside" id="cW6-PW-PY4"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </view>
+                    <connections>
+                        <segue destination="CqI-6Q-JEL" kind="modal" identifier="customBack" id="MXQ-eO-eDq"/>
+                        <segue destination="em5-7g-2Df" kind="modal" identifier="enterRecommand" id="6it-l4-sYO"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Z0s-LH-Ofg" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2869" y="1372"/>
+        </scene>
     </scenes>
     <resources>
         <image name="Alarm_Big" width="68" height="64"/>
@@ -1905,7 +1943,7 @@
     <inferredMetricsTieBreakers>
         <segue reference="Cda-O9-Gf6"/>
         <segue reference="3sm-yn-fKz"/>
-        <segue reference="len-vs-FWN"/>
+        <segue reference="MXQ-eO-eDq"/>
         <segue reference="6lM-kg-mek"/>
     </inferredMetricsTieBreakers>
 </document>
