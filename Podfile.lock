@@ -1,0 +1,17 @@
+PODS:
+  - BaiduMapKit (3.4.0)
+  - Charts (3.0.2):
+    - Charts/Core (= 3.0.2)
+  - Charts/Core (3.0.2)
+
+DEPENDENCIES:
+  - BaiduMapKit
+  - Charts
+
+SPEC CHECKSUMS:
+  BaiduMapKit: 0a5e5e0b1e3fd8dc5aceb40ab9b89e52e1d13df9
+  Charts: 236d6ccdd0ce6feae151d89e829a7397381a21fd
+
+PODFILE CHECKSUM: 70f4710ae351d416eb8414c44be0b56b263cdf54
+
+COCOAPODS: 1.4.0.beta.1
