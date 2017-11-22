@@ -22,7 +22,7 @@ class User: NSObject{
     var historyRecord:[EatRecord]!
     var colorTheme:UIColor{
         get{
-            let colors = [UIColor(red: 29/255, green: 176/255, blue: 184/255, alpha: 0.8), UIColor(red: 55 / 255.0, green: 202 / 255.0, blue: 123 / 255.0, alpha: 0.8), UIColor(red: 255/255, green: 165/255, blue: 0/255, alpha: 0.8)]
+            let colors = [UIColor(red: 208/255, green: 217/255, blue: 224/255, alpha: 0.7), UIColor(red: 133 / 255.0, green: 207 / 255.0, blue: 213 / 255.0, alpha: 0.7), UIColor(red: 30/255, green: 161/255, blue: 177/255, alpha: 0.7)]
             return colors[state]
         }
     }
@@ -128,37 +128,91 @@ class User: NSObject{
     }*/
     //登录时初始化数据
     func initWithJson(with json:AnyObject?){
-        userName = json?.object(forKey:"username") as! String
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let timeFormatter = DateFormatter()
+        timeFormatter.dateFormat = "hh:mm"
+        userName = json?.object(forKey:"userID") as! String
         name = json?.object(forKey: "name") as! String
         healthInfo.updateUserData()
-        let imageURL = URL(string: json?.object(forKey: "headImage") as! String)
-        let imageData = NSData(contentsOf: imageURL!)
-        headImage = UIImage(data: imageData! as Data)
-        birthday = json?.object(forKey: "birthday") as! Date
+        birthday = dateFormatter.date(from: json?.object(forKey: "birthday") as! String)
         email = json?.object(forKey: "email") as! String
-        let remindObject = json?.object(forKey:"remind") as AnyObject
-        remind["on"] = remindObject.object(forKey: "on") as! Int
-        remind["time"] = remindObject.object(forKey: "time") as! Int
-        let g = json?.object(forKey: "gender") as! String
-        let w = json?.object(forKey: "weight") as! String
-        let h = json?.object(forKey: "height") as! String
-        weight = (w as NSString).intValue
-        height = (h as NSString).intValue
-        gender = g == "男" ? true : false
+        remind["on"] = json?.object(forKey:"remind") as! Int
+        remind["time"] = timeFormatter.date(from: "17:30")
+        let g = json?.object(forKey: "gender") as! Int32
+        weight = json?.object(forKey: "weight") as! Int32
+        height = json?.object(forKey: "height") as! Int32
+        gender = g == 1 ? true : false
+        let records = json?.object(forKey: "history") as! [AnyObject]
+        for record in records{
+            let eatRecord = EatRecord(with: record)
+            eatRecord.BMP = self.BMR
+            self.historyRecord.append(eatRecord)
+        }
+        downloadImage()
+    }
+    //从服务器获取头像
+    func downloadImage(){
+        let url = URL(string: "http://www.sgmy.site/api/v2.0/download/"+userName+".jpg")!
+        do{
+            let data = try Data(contentsOf: url)
+            headImage = UIImage(data: data)
+        }catch{
+            print("网络错误")
+        }
+        
+        /*
+        let headers = [
+            "authorization": "Basic eGp5OjIwMTcwNzI0",
+            "content-type": "application/json",
+            "cache-control": "no-cache",
+            "postman-token": "ee43bdf3-ee2a-7154-7594-1a0a63de0eb1"
+        ]
+        let parameters = [
+            "userID": self.userName,
+            ] as [String : Any]
+        
+        do{
+            let postData = try JSONSerialization.data(withJSONObject: parameters, options: [])
+            
+            let request = NSMutableURLRequest(url: NSURL(string: "http://www.sgmy.site/api/v2.0/dowmloadimage")! as URL,
+                                              cachePolicy: .useProtocolCachePolicy,
+                                              timeoutInterval: 10.0)
+            request.httpMethod = "POST"
+            request.allHTTPHeaderFields = headers
+            request.httpBody = postData as Data
+            
+            let session = URLSession.shared
+            let dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in
+                if (error != nil) {
+                    NSLog(error.debugDescription)
+                } else {
+                    self.headImage = UIImage.init(data: data!)
+                }
+            })
+            dataTask.resume()
+        }
+        catch let error{
+            NSLog("JSON失败\(error)")
+        }
+     */
     }
     //向服务器端提交修改请求
     func editUserInfo()->Int{
         var result = 0
-        let parameters = ["name":self.name,"gender":self.gender,"height":self.height,"weight":self.weight,"birthday":self.birthday] as [String : Any]
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        //userID, name, email, weight, height, gender, birthday, remind
+        let parameters = ["userID":self.userName,"name":self.name,"gender":self.gender,"height":self.height,"weight":self.weight,"birthday":dateFormatter.string(from: self.birthday),"remind":1,"email":self.email] as [String : Any]
         let headers = [
+            "authorization": "Basic eGp5OjIwMTcwNzI0",
             "content-type": "application/json",
-            "authorization": "Basic eno6MjAxNzA3MzE=",
             "cache-control": "no-cache",
-            "postman-token": "609cf8e1-cad3-dae1-8d6e-b1e459216599"
+            "postman-token": "ee43bdf3-ee2a-7154-7594-1a0a63de0eb1"
         ]
         do{
             let postData = try JSONSerialization.data(withJSONObject: parameters, options: [])
-            let request = NSMutableURLRequest(url: NSURL(string: "http://www.sgmy.site/eat/api/v1.0/login")! as URL,
+            let request = NSMutableURLRequest(url: NSURL(string: "http://www.sgmy.site/api/v2.0/changeinfo")! as URL,
                                               cachePolicy: .useProtocolCachePolicy,
                                               timeoutInterval: 10.0)
             request.httpMethod = "PUT"
@@ -171,7 +225,10 @@ class User: NSObject{
                     NSLog(error.debugDescription)
                 } else {
                     let json = try?JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.allowFragments) as AnyObject
-                    result = json?.object(forKey: "status") as! Int
+                    let status = json?.object(forKey: "result") as! String
+                    if status == "true"{
+                        result = 1
+                    }
                 }
             })
             dataTask.resume()

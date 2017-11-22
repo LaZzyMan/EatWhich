@@ -161,6 +161,7 @@ class ThirdRegisterController: UIViewController, UITextFieldDelegate, UIImagePic
         registerStyle.layer.borderWidth = 2
         registerStyle.layer.cornerRadius = 12;
         registerStyle.layer.masksToBounds = true
+        progress.transform = CGAffineTransform.init(scaleX: 1.0, y: 3.0)
     }
 
     override func didReceiveMemoryWarning() {
@@ -207,21 +208,14 @@ class ThirdRegisterController: UIViewController, UITextFieldDelegate, UIImagePic
             newUser.gender = genderSelect.selectedSegmentIndex == 0 ? true : false
             newUser.birthday = birthdayCalendar.date
             self.progress.setProgress(1, animated: true)
+            self.emailView.isHidden = false
+            nextButton.setTitle("完成注册", for: UIControlState.normal)
             return
         }
         if self.state == 3{
-            self.emailView.isHidden = false
-            nextButton.setTitle("完成注册", for: UIControlState.normal)
-            if identityCode == identityTextField.text{
-                let registerResult = self.registerToserver()
-                if registerResult == 1{
-                    self.performSegue(withIdentifier: "registerToLogin", sender: nil)
-                }else{
-                    let alertController = UIAlertController(title: "系统提示",message: "网络错误", preferredStyle: .alert)
-                    let cancelAction = UIAlertAction(title: "确定", style: .cancel, handler: nil)
-                    alertController.addAction(cancelAction)
-                    self.present(alertController, animated: true, completion: nil)
-                }
+            
+            if true{
+                self.performSegue(withIdentifier: "registerToLogin", sender: nil)
             }else{
                 let alertController = UIAlertController(title: "系统提示",message: "验证码错误", preferredStyle: .alert)
                 let cancelAction = UIAlertAction(title: "确定", style: .cancel, handler: nil)
@@ -242,6 +236,8 @@ class ThirdRegisterController: UIViewController, UITextFieldDelegate, UIImagePic
             info1.resignFirstResponder()
             info2.resignFirstResponder()
             nameTextField.resignFirstResponder()
+            emailTextField.resignFirstResponder()
+            identityTextField.resignFirstResponder()
         }
         sender.cancelsTouchesInView = false
     }
@@ -255,108 +251,189 @@ class ThirdRegisterController: UIViewController, UITextFieldDelegate, UIImagePic
         self.info2.becomeFirstResponder()
     }
   
+    //邮件发送响应按钮
+    @IBAction func sendEmailButton(_ sender: Any) {
+        //registerToserver()
+        //uploadImage()
+        //sendEmail()
+        sendButton.setTitle("重新发送", for: .normal)
+    }
     @IBAction func keyBoardReturn(_ sender: Any) {
         self.view.endEditing(true)
     }
     
     //注册到服务器
-    func registerToserver() -> Int{
-        let fileManager:FileManager = FileManager.default
-        fileManager.createFile(atPath: NSHomeDirectory()+"/headimage.png", contents: UIImagePNGRepresentation(newUser.headImage), attributes: nil)
+    func registerToserver(){
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "YYYY-MM-dd"
         let headers = [
-            "content-type": "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
+            "content-type": "application/json",
+            "authorization": "Basic eGp5OjIwMTcwNzI0",
             "cache-control": "no-cache",
-            "postman-token": "20b4efa1-39fc-5668-6bdf-c32b3e84d758"
+            "postman-token": "437228ac-ed70-cf35-c39f-332f10a3190c"
         ]
-    
         let parameters = [
-            [
-                "name": "username",
-                "value": self.newUser.userName
-            ],
-            [
-                "name": "password",
-                "value": self.password
-            ],
-            [
-                "name": "name",
-                "value": self.newUser.name
-            ],
-            [
-                "name": "gender",
-                "value": "\(self.newUser.gender)"
-            ],
-            [
-                "name": "height",
-                "value": "\(newUser.height)"
-            ],
-            [
-                "name": "weight",
-                "value": "\(newUser.weight)"
-            ],
-            [
-                "name": "birthday",
-                "value": dateFormatter.string(from: newUser.birthday)
-            ],
-            [
-                "name": "email",
-                "value": newUser.email
-            ],
-            [
-                "name": "headimage",
-                "fileName": NSHomeDirectory()+"headimage.png"
-            ]
-        ] as [[String:String]]
+            "userID": newUser.userName,
+            "password": password,
+            "name": newUser.name,
+            "email": newUser.email,
+            "weight": newUser.weight,
+            "height": newUser.height,
+            "gender": newUser.gender == true ? 1 : 0,
+            "birthday": dateFormatter.string(from: newUser.birthday),
+            "remind": 1
+            ] as [String : Any]
         
-        let boundary = "----WebKitFormBoundary7MA4YWxkTrZu0gW"
-        
-        var body = ""
-        let error: NSError? = nil
-        for param in parameters {
-            let paramName = param["name"]!
-            body += "--\(boundary)\r\n"
-            body += "Content-Disposition:form-data; name=\"\(paramName)\""
-            if let filename = param["fileName"] {
-                let contentType = param["content-type"]!
-                var fileContent:String?
-                do{
-                    fileContent = try String(contentsOfFile: filename, encoding: .utf8)
-                }catch{
-                    fileContent = nil
-                }
+        do{
+            let postData = try JSONSerialization.data(withJSONObject: parameters, options: [])
+            
+            let request = NSMutableURLRequest(url: NSURL(string: "http://www.sgmy.site/api/v2.0/register")! as URL,
+                                              cachePolicy: .useProtocolCachePolicy,
+                                              timeoutInterval: 10.0)
+            request.httpMethod = "PUT"
+            request.allHTTPHeaderFields = headers
+            request.httpBody = postData as Data
+            
+            let session = URLSession.shared
+            let dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in
                 if (error != nil) {
-                    print(error!)
+                    NSLog(error.debugDescription)
+                } else {
+                    let json = try?JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.allowFragments) as AnyObject
+                    let status = json?.object(forKey: "result") as! String
+                    if status != "True"{
+                        let alertController = UIAlertController(title: "Warning",message: status, preferredStyle: .alert)
+                        let cancelAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+                        alertController.addAction(cancelAction)
+                    }
                 }
-                body += "; filename=\"\(filename)\"\r\n"
-                body += "Content-Type: \(contentType)\r\n\r\n"
-                body += fileContent!
-            } else if let paramValue = param["value"] {
-                body += "\r\n\r\n\(paramValue)"
-            }
+            })
+            dataTask.resume()
         }
+        catch let error{
+            NSLog("JSON失败\(error)")
+        }
+    }
+    //发送邮件
+    func sendEmail(){
+        let headers = [
+            "content-type": "application/json",
+            "authorization": "Basic eGp5OjIwMTcwNzI0",
+            "cache-control": "no-cache",
+            "postman-token": "437228ac-ed70-cf35-c39f-332f10a3190c"
+        ]
+        let parameters = [
+            "userID": newUser.userName,
+            ] as [String : Any]
         
-        let request = NSMutableURLRequest(url: NSURL(string: "http://www.sgmy.site/eat/api/v1.0/register")! as URL,
-                                          cachePolicy: .useProtocolCachePolicy,
-                                          timeoutInterval: 10.0)
-        request.httpMethod = "PUT"
-        request.allHTTPHeaderFields = headers
-        request.httpBody = body.data(using: .utf8)
+        do{
+            let postData = try JSONSerialization.data(withJSONObject: parameters, options: [])
+            
+            let request = NSMutableURLRequest(url: NSURL(string: "http://www.sgmy.site/api/v2.0/sendmessage")! as URL,
+                                              cachePolicy: .useProtocolCachePolicy,
+                                              timeoutInterval: 10.0)
+            request.httpMethod = "PUT"
+            request.allHTTPHeaderFields = headers
+            request.httpBody = postData as Data
+            
+            let session = URLSession.shared
+            let dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in
+                if (error != nil) {
+                    NSLog(error.debugDescription)
+                } else {
+                    let json = try?JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.allowFragments) as AnyObject
+                    let status = json?.object(forKey: "result") as! String
+                    if status != "True"{
+                        let alertController = UIAlertController(title: "Warning",message: status, preferredStyle: .alert)
+                        let cancelAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+                        alertController.addAction(cancelAction)
+                    }
+                }
+            })
+            dataTask.resume()
+        }
+        catch let error{
+            NSLog("JSON失败\(error)")
+        }
+    }
+    //验证邮箱
+    func confirmEmail() -> Int{
+        var result = 1
+        let headers = [
+            "authorization": "Basic eGp5OjIwMTcwNzI0",
+            "content-type": "application/json",
+            "cache-control": "no-cache",
+            "postman-token": "ee43bdf3-ee2a-7154-7594-1a0a63de0eb1"
+        ]
+        let parameters = [
+            "userID": newUser.userName,
+            "confirmnumber": identityTextField.text!
+            ] as [String : Any]
         
-        let session = URLSession.shared
-        var connstatus = 0
-        let dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in
-            if (error != nil) {
-                NSLog(error.debugDescription)
-            } else {
+        do{
+            let postData = try JSONSerialization.data(withJSONObject: parameters, options: [])
+            
+            let request = NSMutableURLRequest(url: NSURL(string: "http://www.sgmy.site/api/v2.0/ensureemail")! as URL,
+                                              cachePolicy: .useProtocolCachePolicy,
+                                              timeoutInterval: 10.0)
+            request.httpMethod = "PUT"
+            request.allHTTPHeaderFields = headers
+            request.httpBody = postData as Data
+            
+            let session = URLSession.shared
+            let dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in
+                if (error != nil) {
+                    NSLog(error.debugDescription)
+                } else {
+                    let json = try?JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.allowFragments) as AnyObject
+                    let status = json?.object(forKey: "result") as! String
+                    if status != "True"{
+                        let alertController = UIAlertController(title: "Warning",message: "验证码错误", preferredStyle: .alert)
+                        let cancelAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+                        alertController.addAction(cancelAction)
+                        result = 0
+                    }
+                }
+            })
+            dataTask.resume()
+        }
+        catch let error{
+            NSLog("JSON失败\(error)")
+        }
+        return result
+    }
+    //上传图片
+    func uploadImage(){
+        let data=UIImagePNGRepresentation(newUser.headImage)//把图片转成data
+        let uploadurl:String="http://www.sgmy.site/api/v2.0/uploadimage"//设置服务器接收地址
+        let request=NSMutableURLRequest(url:URL(string:uploadurl)!)
+        request.httpMethod="POST"//设置请求方式
+        let boundary:String="-------------------21212222222222222222222"
+        let contentType:String="multipart/form-data;boundary="+boundary
+        request.addValue(contentType, forHTTPHeaderField:"Content-Type")
+        let body=NSMutableData()
+        //在表单中写入要上传的图片
+        body.append(NSString(format:"--\(boundary)\r\n" as NSString).data(using: String.Encoding.utf8.rawValue)!)
+        body.append(NSString(format:"Content-Disposition:form-data;name=\"headimage\";filename=\"\(newUser.userName).jpg\"\r\n" as NSString).data(using: String.Encoding.utf8.rawValue)!)
+        
+        //body.appendData(NSString(format:"Content-Type:application/octet-stream\r\n\r\n").dataUsingEncoding(NSUTF8StringEncoding)!)
+        body.append("Content-Type:image/png\r\n\r\n".data(using: String.Encoding.utf8)!)
+        body.append(data!)
+        body.append(NSString(format:"\r\n--\(boundary)--\r\n" as NSString).data(using: String.Encoding.utf8.rawValue)!)
+        //设置post的请求体
+        request.httpBody=body as Data
+        let que=OperationQueue()
+        NSURLConnection.sendAsynchronousRequest(request as URLRequest, queue: que, completionHandler: {
+            (response, data, error) ->Void in
+            if (error != nil){
+                NSLog("NetWork Unconnected")
+            }else{
                 let json = try?JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.allowFragments) as AnyObject
-                connstatus = json?.object(forKey: "status") as! Int
+                let status = json?.object(forKey: "result") as! Int
+                if status == 0{
+                    NSLog("Upload Failed")
+                }
             }
         })
-        
-        dataTask.resume()
-        return connstatus
     }
-   
 }

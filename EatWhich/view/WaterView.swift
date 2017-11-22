@@ -37,9 +37,9 @@ class WaterView: UIView {
     //状态值
     var state: Int = 0
     //颜色表
-    let colors = [[UIColor(red: 29/255, green: 176/255, blue: 184/255, alpha: 0.5),UIColor(red: 55/255, green: 198/255, blue: 192/255, alpha: 0.5),UIColor(red: 208/255, green: 233/255, blue: 255/255, alpha: 0.5)],
-                  [UIColor(red: 55 / 255.0, green: 202 / 255.0, blue: 123 / 255.0, alpha: 0.5),UIColor(red: 50 / 255.0, green: 200 / 255.0, blue: 110 / 255.0, alpha: 0.5),UIColor(red: 60 / 255.0, green: 230 / 255.0, blue: 120 / 255.0, alpha: 0.5)],
-                  [UIColor(red: 255/255, green: 250/255, blue: 205/255, alpha: 0.5) ,UIColor(red: 255/255, green: 218/255, blue: 185/255, alpha: 0.5), UIColor(red: 255/255, green: 165/255, blue: 0/255, alpha: 0.5)]]
+    let colors = [[UIColor(red: 208/255, green: 217/255, blue: 224/255, alpha: 0.5),UIColor(red: 224/255, green: 228/255, blue: 230/255, alpha: 0.5),UIColor(red: 236/255, green: 237/255, blue: 234/255, alpha: 0.5)],
+                  [UIColor(red: 133 / 255.0, green: 207 / 255.0, blue: 213 / 255.0, alpha: 0.5),UIColor(red: 163 / 255.0, green: 217 / 255.0, blue: 223 / 255.0, alpha: 0.5),UIColor(red: 193 / 255.0, green: 235 / 255.0, blue: 240 / 255.0, alpha: 0.5)],
+                  [UIColor(red: 30/255, green: 161/255, blue: 177/255, alpha: 0.5) ,UIColor(red: 40/255, green: 200/255, blue: 210/255, alpha: 0.5), UIColor(red: 50/255, green: 222/255, blue: 233/255, alpha: 0.5)]]
     //定时器
     lazy var displayLink : CADisplayLink = CADisplayLink()
     //第一个Layer
@@ -88,7 +88,7 @@ class WaterView: UIView {
         //设置周期
         waveW = 2 * CGFloat(Double.pi) / bounds.width
         //设置波浪纵向位置
-        currentWaveK = bounds.height*(0.75-0.25*CGFloat(state))
+        currentWaveK = bounds.height*(0.8-0.2*CGFloat(state))
         
         //添加Layer
         layer.addSublayer(firstWaveLayer)

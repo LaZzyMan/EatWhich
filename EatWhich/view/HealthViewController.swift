@@ -12,29 +12,34 @@ import CoreMotion
 class HealthViewController: UIViewController {
     
     @IBOutlet weak var floorsText: UILabel!
+    @IBOutlet weak var progressView: UIProgressView!
     @IBOutlet weak var distanceText: UILabel!
     @IBOutlet weak var stepsText: UILabel!
-    @IBOutlet weak var energyTxet: UILabel!
     @IBOutlet weak var usedText: UILabel!
     @IBOutlet weak var stasticView: UIView!
     @IBOutlet weak var upLabel: UILabel!
     @IBOutlet weak var downlabel: UILabel!
+    @IBOutlet weak var baseUse: UILabel!
+    @IBOutlet weak var sportUse: UILabel!
     @IBOutlet weak var totalEnergy: UILabel!
     var user:User!
    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        let baseUseNum = user.BMR
+        let sportUseNum = user.healthInfo.energy
+        baseUse.text! = "基本消耗"+String(Int(baseUseNum))+"KCal"
+        sportUse.text! = "运动消耗"+String(Int(sportUseNum))+"KCal"
+        progressView.setProgress(baseUseNum/(baseUseNum+sportUseNum), animated: true)
+        progressView.transform = CGAffineTransform(scaleX: 1.0, y: 7.0)
         floorsText.text = String(user.healthInfo.floors)+"层"
-        floorsText.textColor = user.colorTheme
+        //floorsText.textColor = user.colorTheme
         distanceText.text = String(format: "%.2f", user.healthInfo.distance)+"KM"
-        distanceText.textColor = user.colorTheme
+        //distanceText.textColor = user.colorTheme
         stepsText.text = String(user.healthInfo.steps)+"步"
-        stepsText.textColor = user.colorTheme
-        energyTxet.text = String(Int(user.energyNeed))+"Kcal"
-        energyTxet.textColor = user.colorTheme
+        //stepsText.textColor = user.colorTheme
         usedText.text = String(Int(user.healthInfo.energy))+"Kcal"
-        usedText.textColor = user.colorTheme
+        //usedText.textColor = user.colorTheme
         
     }
 

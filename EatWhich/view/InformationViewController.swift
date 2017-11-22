@@ -24,17 +24,19 @@ class InformationViewController: UIViewController {
         super.viewDidLoad()
 
         //设置按钮样式
-        editInforStyle.layer.borderColor = UIColor(red: 25/255, green: 148/255, blue: 117/255, alpha: 0.8).cgColor
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        editInforStyle.layer.borderColor = user.colorTheme.cgColor
         editInforStyle.layer.borderWidth = 2
         editInforStyle.layer.cornerRadius = 12
         editInforStyle.layer.masksToBounds = true
         sexLabel.text = user.gender == true ? "男" : "女"
-        birthLabel.text = user.birthday.description
+        birthLabel.text = dateFormatter.string(from: user.birthday)
         hightLabel.text = String(user.height)
         weightLabel.text = String(user.weight)
         name.text = user.name
         headImage.image = user.headImage
-        headImage.layer.cornerRadius = 75
+        headImage.layer.cornerRadius = 25
         headImage.layer.masksToBounds = true
         
         

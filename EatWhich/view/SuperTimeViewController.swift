@@ -13,15 +13,15 @@ class SuperTimeViewController: UIViewController {
 
     @IBOutlet weak var submitButton: UIButton!
     @IBOutlet weak var datePicker: UIDatePicker!
-    @IBOutlet weak var openOrClose: UISegmentedControl!
+    @IBOutlet weak var remindSwitch: UISwitch!
     override func viewDidLoad() {
         super.viewDidLoad()
-        submitButton.layer.cornerRadius = 10
-        submitButton.layer.masksToBounds = true
-        submitButton.layer.borderWidth = 2
-        submitButton.layer.borderColor = user.colorTheme.cgColor
-        submitButton.setTitleColor(user.colorTheme, for: .normal)
-        openOrClose.tintColor = user.colorTheme
+        //submitButton.layer.cornerRadius = 10
+        //submitButton.layer.masksToBounds = true
+        //submitButton.layer.borderWidth = 2
+        //submitButton.layer.borderColor = user.colorTheme.cgColor
+        //submitButton.setTitleColor(user.colorTheme, for: .normal)
+        //openOrClose.tintColor = user.colorTheme
 
         // Do any additional setup after loading the view.
     }
@@ -44,7 +44,7 @@ class SuperTimeViewController: UIViewController {
 
     
     @IBAction func submit(_ sender: Any) {
-        if openOrClose.selectedSegmentIndex == 0{
+        if remindSwitch.isOn == true{
             //创建UILocalNotification来进行本地消息通知
             let localNotification = UILocalNotification()
             //推送时间（设置为30秒以后）

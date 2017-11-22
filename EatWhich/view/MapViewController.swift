@@ -22,14 +22,15 @@ class MapViewController: UIViewController, BMKMapViewDelegate, UIPageViewControl
     @IBOutlet weak var containView: UIView!
     @IBOutlet weak var pageController: UIPageControl!
     @IBOutlet weak var waitView: UIView!
+    @IBOutlet weak var waitProgress: UIActivityIndicatorView!
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let stylePath = Bundle.main.path(forResource: "custom_config_清新蓝", ofType: "")
+        let stylePath = Bundle.main.path(forResource: "mapConfig", ofType: "")
         BMKMapView.customMapStyle(stylePath)
         
         routeSearch = BMKRouteSearch()
-        mapView = BMKMapView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
+        mapView = BMKMapView(frame: map.frame)
         self.map.addSubview(mapView)
         BMKMapView.enableCustomMapStyle(true)
         //mapView.isBuildingsEnabled = false
@@ -37,7 +38,7 @@ class MapViewController: UIViewController, BMKMapViewDelegate, UIPageViewControl
         //mapView.showsUserLocation = false
         mapView.userTrackingMode = BMKUserTrackingModeFollow
         //mapView.showsUserLocation = true
-        blackFilter.backgroundColor = UIColor.black.withAlphaComponent(0.4)
+        //blackFilter.backgroundColor = UIColor.black.withAlphaComponent(0.4)
         
         pageViewController = self.childViewControllers.first as! UIPageViewController
         pageViewController.delegate = self;
@@ -46,9 +47,9 @@ class MapViewController: UIViewController, BMKMapViewDelegate, UIPageViewControl
         self.pageController.currentPage = 0
         
         //ui更新
-        self.containView.layer.cornerRadius = 20
-        self.containView.layer.masksToBounds = true
-        self.containView.backgroundColor = UIColor.white.withAlphaComponent(0.2)
+        //self.containView.layer.cornerRadius = 20
+        //self.containView.layer.masksToBounds = true
+        //self.containView.backgroundColor = UIColor.white.withAlphaComponent(0.2)
         self.mapView.isBuildingsEnabled = false
         
         //创建加载动画
@@ -95,7 +96,10 @@ class MapViewController: UIViewController, BMKMapViewDelegate, UIPageViewControl
             circle.add(animation, forKey: "animation")
             layer.addSublayer(circle)
         }
-        updateBackground()
+        DispatchQueue.main.async(execute: {
+            self.updateBackground()
+            })
+        //updateBackground()
     }
     override func viewWillAppear(_ animated: Bool) {
         mapView.viewWillAppear()
@@ -203,6 +207,8 @@ class MapViewController: UIViewController, BMKMapViewDelegate, UIPageViewControl
             let polyLine = BMKPolyline(points: &tempPoints, count: UInt(planPointCounts))
             mapView.add(polyLine)  // 添加路线 overlay
             mapViewFitPolyLine(polyLine)
+            waitProgress.stopAnimating()
+            blackFilter.isUserInteractionEnabled = true
             waitView.isHidden = true
         }
     }
@@ -214,8 +220,12 @@ class MapViewController: UIViewController, BMKMapViewDelegate, UIPageViewControl
         if self.pageController.currentPage == 2{
             return nil
         }
+        waitProgress.startAnimating()
+        blackFilter.isUserInteractionEnabled = false
         self.pageController.currentPage += 1
-        self.updateBackground()
+        DispatchQueue.main.async(execute: {
+            self.updateBackground()
+        })
         return pageList[self.pageController.currentPage] as UIViewController
     }
     
@@ -225,8 +235,12 @@ class MapViewController: UIViewController, BMKMapViewDelegate, UIPageViewControl
         if self.pageController.currentPage == 0{
             return nil
         }
+        waitProgress.startAnimating()
+        blackFilter.isUserInteractionEnabled = false
         self.pageController.currentPage -= 1
-        self.updateBackground()
+        DispatchQueue.main.async(execute: {
+            self.updateBackground()
+        })
         return pageList[self.pageController.currentPage] as UIViewController
     }
     

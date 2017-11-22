@@ -35,6 +35,10 @@
 		0A235B8A1F6406A90024EBFF /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A235B891F6406A90024EBFF /* QuartzCore.framework */; };
 		0A235B8C1F6406B40024EBFF /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A235B8B1F6406B40024EBFF /* CoreFoundation.framework */; };
 		0A235BA61F64DEE30024EBFF /* custom_config_清新蓝 in Resources */ = {isa = PBXBuildFile; fileRef = 0A235BA31F64DEE30024EBFF /* custom_config_清新蓝 */; };
+		0A2D926B1FA0E3E50097EA26 /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2D926A1FA0E3E50097EA26 /* TestViewController.swift */; };
+		0A2D926E1FA1843B0097EA26 /* FZQKBYSJW.TTF in Sources */ = {isa = PBXBuildFile; fileRef = 0A2D926C1FA1837D0097EA26 /* FZQKBYSJW.TTF */; };
+		0A2D92701FA1B3C30097EA26 /* mapConfig in Resources */ = {isa = PBXBuildFile; fileRef = 0A2D926F1FA1B3C30097EA26 /* mapConfig */; };
+		0A2D92711FA1F3EB0097EA26 /* FZQKBYSJW.TTF in Resources */ = {isa = PBXBuildFile; fileRef = 0A2D926C1FA1837D0097EA26 /* FZQKBYSJW.TTF */; };
 		0A2D9A201F9B4778006CBA34 /* CustomInputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2D9A1F1F9B4778006CBA34 /* CustomInputViewController.swift */; };
 		0A31C7F81F66C7E6003CB1A0 /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A31C7ED1F66C7E6003CB1A0 /* AboutViewController.swift */; };
 		0A31C7F91F66C7E6003CB1A0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A31C7EE1F66C7E6003CB1A0 /* AppDelegate.swift */; };
@@ -60,8 +64,10 @@
 		0A5215781F90A9F700871080 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A5215711F90A9F700871080 /* libssl.a */; };
 		0A5215791F90A9F700871080 /* updatelog.txt in Resources */ = {isa = PBXBuildFile; fileRef = 0A5215721F90A9F700871080 /* updatelog.txt */; };
 		0A58D9871F94CFE600E3AF87 /* EatRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A58D9861F94CFE600E3AF87 /* EatRecord.swift */; };
+		0A8A30CA1FA2097300FFE2EB /* HistoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8A30C91FA2097300FFE2EB /* HistoryTableViewCell.swift */; };
 		0A93F7C31F5B06B000C0AD9D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0A93F7C11F5B06B000C0AD9D /* LaunchScreen.storyboard */; };
 		0A93F7C41F5B06B000C0AD9D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0A93F7C21F5B06B000C0AD9D /* Main.storyboard */; };
+		0AFB70A31FA2572200B64737 /* RecipeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AFB70A21FA2572200B64737 /* RecipeTableViewCell.swift */; };
 		D254DFAE47C8E498E8868425 /* Pods_EatWhich.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7C622F4C2F942C32606A47A /* Pods_EatWhich.framework */; };
 /* End PBXBuildFile section */
 
@@ -112,6 +118,9 @@
 		0A235B891F6406A90024EBFF /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		0A235B8B1F6406B40024EBFF /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		0A235BA31F64DEE30024EBFF /* custom_config_清新蓝 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "custom_config_清新蓝"; path = "EatWhich/view/custom_config_清新蓝"; sourceTree = SOURCE_ROOT; };
+		0A2D926A1FA0E3E50097EA26 /* TestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
+		0A2D926C1FA1837D0097EA26 /* FZQKBYSJW.TTF */ = {isa = PBXFileReference; lastKnownFileType = file; path = FZQKBYSJW.TTF; sourceTree = "<group>"; };
+		0A2D926F1FA1B3C30097EA26 /* mapConfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = mapConfig; sourceTree = "<group>"; };
 		0A2D9A1F1F9B4778006CBA34 /* CustomInputViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomInputViewController.swift; sourceTree = "<group>"; };
 		0A31C7ED1F66C7E6003CB1A0 /* AboutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
 		0A31C7EE1F66C7E6003CB1A0 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -147,10 +156,12 @@
 		0A5215711F90A9F700871080 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libssl.a; sourceTree = "<group>"; };
 		0A5215721F90A9F700871080 /* updatelog.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = updatelog.txt; sourceTree = "<group>"; };
 		0A58D9861F94CFE600E3AF87 /* EatRecord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EatRecord.swift; sourceTree = "<group>"; };
+		0A8A30C91FA2097300FFE2EB /* HistoryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryTableViewCell.swift; sourceTree = "<group>"; };
 		0A93F76E1F5AFD8000C0AD9D /* EatWhich.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EatWhich.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A93F7831F5AFDBF00C0AD9D /* EatWhich-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "EatWhich-Bridging-Header.h"; sourceTree = "<group>"; };
 		0A93F7C11F5B06B000C0AD9D /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0A93F7C21F5B06B000C0AD9D /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		0AFB70A21FA2572200B64737 /* RecipeTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeTableViewCell.swift; sourceTree = "<group>"; };
 		7790AA40F82CAFAFC55BC2FD /* Pods-EatWhich.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EatWhich.debug.xcconfig"; path = "Pods/Target Support Files/Pods-EatWhich/Pods-EatWhich.debug.xcconfig"; sourceTree = "<group>"; };
 		E7C622F4C2F942C32606A47A /* Pods_EatWhich.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EatWhich.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -231,6 +242,14 @@
 			path = BaiduNaviSDK_v3.2.0/BaiduNaviSDK/thirdlibs;
 			sourceTree = "<group>";
 		};
+		0A2D926D1FA184130097EA26 /* res */ = {
+			isa = PBXGroup;
+			children = (
+				0A2D926C1FA1837D0097EA26 /* FZQKBYSJW.TTF */,
+			);
+			path = res;
+			sourceTree = "<group>";
+		};
 		0A4B03BB1F9825190071A8CB /* view */ = {
 			isa = PBXGroup;
 			children = (
@@ -239,6 +258,7 @@
 				0A31C8031F66C891003CB1A0 /* ViewController.swift */,
 				0A31C7ED1F66C7E6003CB1A0 /* AboutViewController.swift */,
 				0A235BA31F64DEE30024EBFF /* custom_config_清新蓝 */,
+				0A2D926F1FA1B3C30097EA26 /* mapConfig */,
 				0A93F7C11F5B06B000C0AD9D /* LaunchScreen.storyboard */,
 				0A93F7C21F5B06B000C0AD9D /* Main.storyboard */,
 				0A31C7F11F66C7E6003CB1A0 /* EditInforViewController.swift */,
@@ -255,6 +275,9 @@
 				0A4B03BD1F9831D50071A8CB /* RecordViewController.swift */,
 				0A4B03BF1F9831E90071A8CB /* HistoryViewController.swift */,
 				0A2D9A1F1F9B4778006CBA34 /* CustomInputViewController.swift */,
+				0A2D926A1FA0E3E50097EA26 /* TestViewController.swift */,
+				0A8A30C91FA2097300FFE2EB /* HistoryTableViewCell.swift */,
+				0AFB70A21FA2572200B64737 /* RecipeTableViewCell.swift */,
 			);
 			path = view;
 			sourceTree = "<group>";
@@ -332,6 +355,7 @@
 		0A93F7701F5AFD8000C0AD9D /* EatWhich */ = {
 			isa = PBXGroup;
 			children = (
+				0A2D926D1FA184130097EA26 /* res */,
 				0A4B03BC1F98256E0071A8CB /* model */,
 				0A4B03BB1F9825190071A8CB /* view */,
 				0A31C7EE1F66C7E6003CB1A0 /* AppDelegate.swift */,
@@ -389,7 +413,7 @@
 						CreatedOnToolsVersion = 8.3.3;
 						DevelopmentTeam = 35CAMRVQPE;
 						LastSwiftMigration = 0830;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.Maps.iOS = {
 								enabled = 0;
@@ -421,6 +445,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A2D92711FA1F3EB0097EA26 /* FZQKBYSJW.TTF in Resources */,
 				0A5215791F90A9F700871080 /* updatelog.txt in Resources */,
 				0A31C7FA1F66C7E6003CB1A0 /* Assets.xcassets in Resources */,
 				0A5215741F90A9F700871080 /* baiduNaviSDK.xcassets in Resources */,
@@ -430,6 +455,7 @@
 				0A31C7FD1F66C7E6003CB1A0 /* Info.plist in Resources */,
 				0A5215761F90A9F700871080 /* readme.txt in Resources */,
 				0A93F7C31F5B06B000C0AD9D /* LaunchScreen.storyboard in Resources */,
+				0A2D92701FA1B3C30097EA26 /* mapConfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -497,7 +523,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A2D926E1FA1843B0097EA26 /* FZQKBYSJW.TTF in Sources */,
 				0A31C7FE1F66C7E6003CB1A0 /* InformationViewController.swift in Sources */,
+				0A8A30CA1FA2097300FFE2EB /* HistoryTableViewCell.swift in Sources */,
 				0A235ABA1F6398DD0024EBFF /* RouteAnnotation.swift in Sources */,
 				0A31C7FB1F66C7E6003CB1A0 /* EditInforViewController.swift in Sources */,
 				0A4B03BE1F9831D50071A8CB /* RecordViewController.swift in Sources */,
@@ -507,6 +535,8 @@
 				0A17E5561F5D6AEE0004594E /* HealthInfo.swift in Sources */,
 				0A31C8041F66C891003CB1A0 /* HealthViewController.swift in Sources */,
 				0A31C8001F66C7E6003CB1A0 /* MapViewController.swift in Sources */,
+				0AFB70A31FA2572200B64737 /* RecipeTableViewCell.swift in Sources */,
+				0A2D926B1FA0E3E50097EA26 /* TestViewController.swift in Sources */,
 				0A235AB81F6315880024EBFF /* WaitViewController.swift in Sources */,
 				0A3DB8191F6AEFF6007E1FD4 /* SuperTimeViewController.swift in Sources */,
 				0A17E5541F5D0BE20004594E /* User.swift in Sources */,
@@ -629,7 +659,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer: Zhuo Zhen (5MM452658F)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Zhuo Zhen (5MM452658F)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 35CAMRVQPE;
 				ENABLE_BITCODE = YES;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -653,8 +684,8 @@
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.zz.EatWhich;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "34792d15-1440-4d8d-8972-aa4546e307d5";
-				PROVISIONING_PROFILE_SPECIFIER = whatforsupper;
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "EatWhich-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
@@ -669,7 +700,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer: Zhuo Zhen (5MM452658F)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Zhuo Zhen (5MM452658F)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 35CAMRVQPE;
 				ENABLE_BITCODE = YES;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -693,8 +725,8 @@
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.zz.EatWhich;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "34792d15-1440-4d8d-8972-aa4546e307d5";
-				PROVISIONING_PROFILE_SPECIFIER = whatforsupper;
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "EatWhich-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 			};

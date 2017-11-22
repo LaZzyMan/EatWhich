@@ -23,13 +23,13 @@ class PageViewController: UIViewController {
     @IBOutlet var background: UIView!
     override func viewDidLoad() {
         super.viewDidLoad()
-        background.backgroundColor = UIColor.white.withAlphaComponent(0.2)
+        //background.backgroundColor = UIColor.white.withAlphaComponent(0.2)
         nameLabel.text = restaurant.object(forKey: "name") as? String
         distance.text = "距离您"+String(format: "%d", (restaurant.object(forKey: "distance") as! Int))+"米"
         energyLabel.text = "预计热量：" + String(format: "%.2f", restaurant.object(forKey: "hot") as! Float) + "KCal"
         detailButton.layer.masksToBounds = true
         detailButton.layer.borderColor = user.colorTheme.cgColor
-        detailButton.setTitleColor(user.colorTheme, for: .normal)
+        //detailButton.setTitleColor(user.colorTheme, for: .normal)
         detailButton.layer.borderWidth = 2
         detailButton.layer.cornerRadius = 10
         let service = (restaurant.object(forKey: "commentScore") as AnyObject).object(forKey: "service") as! NSString

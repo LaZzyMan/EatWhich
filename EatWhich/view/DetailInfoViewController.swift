@@ -17,7 +17,7 @@ class DetailInfoViewController: UIViewController, UITableViewDelegate, UITableVi
     var restaurantPt:CLLocationCoordinate2D!
     var totalHot:Int!
     var selectedIndex = [Int]()
-
+    
     @IBOutlet weak var upView: UIView!
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var tasteLabel: UILabel!
@@ -43,13 +43,13 @@ class DetailInfoViewController: UIViewController, UITableViewDelegate, UITableVi
         chooseView.layer.borderColor = UIColor.black.cgColor
         chooseView.layer.borderWidth = 2
         totalHot = 0
-        upView.backgroundColor = user.colorTheme
-        followMeButton.layer.masksToBounds = true
-        followMeButton.setTitleColor(user.colorTheme, for: .normal)
-        followMeButton.layer.cornerRadius = 25
-        takeOutButton.layer.masksToBounds = true
-        takeOutButton.setTitleColor(user.colorTheme, for: .normal)
-        takeOutButton.layer.cornerRadius = 25
+        //upView.backgroundColor = user.colorTheme
+        //followMeButton.layer.masksToBounds = true
+        //followMeButton.setTitleColor(user.colorTheme, for: .normal)
+        //followMeButton.layer.cornerRadius = 25
+        //takeOutButton.layer.masksToBounds = true
+        //takeOutButton.setTitleColor(user.colorTheme, for: .normal)
+        //takeOutButton.layer.cornerRadius = 25
         nameLabel.text = restaurant.object(forKey: "name") as? String
         teleLabel.text = "电话"+(restaurant.object(forKey: "tel") as? String)!
         addressLabel.text = "地址："+(restaurant.object(forKey: "address") as? String)!
@@ -60,7 +60,7 @@ class DetailInfoViewController: UIViewController, UITableViewDelegate, UITableVi
         environmentLabel.text = "环境："+(rate.object(forKey: "environment") as? String)!+"分"
         tasteLabel.text = "口味："+(rate.object(forKey: "taste") as? String)!+"分"
         recipes = restaurant.object(forKey: "recipe") as? [[String:Any]]
-        recommand.text = "0/"+String(format:"%d",Int(user.energyNeed))
+        recommand.text = "已选菜品:" + "0/"+String(format:"%d",Int(user.energyNeed))
         tableView.delegate = self
         tableView.dataSource = self
         
@@ -87,15 +87,24 @@ class DetailInfoViewController: UIViewController, UITableViewDelegate, UITableVi
         return recipes.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "recipeCell")
-        cell.textLabel?.text = recipes[indexPath.row]["name"] as? String
-        cell.detailTextLabel?.text = "预计热量摄入：" + String(format: "%d", (recipes[indexPath.item]["hot"] as! Int)) + "KCal"
+        let recipeCell = tableView.dequeueReusableCell(withIdentifier: "recipeCell") as! RecipeTableViewCell
+        recipeCell.nameLabel.text! = recipes[indexPath.row]["name"] as! String
+        recipeCell.hotLabel.text! = "预计热量摄入：" + String(format: "%d", (recipes[indexPath.item]["hot"] as! Int)) + "KCal"
         if selectedIndex.contains(indexPath.row){
-            cell.accessoryType = .checkmark
+            recipeCell.accessoryType = .checkmark
         }else{
-            cell.accessoryType = .none
+            recipeCell.accessoryType = .none
         }
-        return cell
+        if (recipes[indexPath.item]["hot"] as! Int) <= 150{
+            recipeCell.headImage.image = #imageLiteral(resourceName: "recipe1")
+            return recipeCell
+        }
+        if (recipes[indexPath.item]["hot"] as! Int) >= 250{
+            recipeCell.headImage.image = #imageLiteral(resourceName: "recipe3")
+            return recipeCell
+        }
+        recipeCell.headImage.image = #imageLiteral(resourceName: "recipe2")
+        return recipeCell
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let index = selectedIndex.index(of:indexPath.row){
@@ -111,7 +120,7 @@ class DetailInfoViewController: UIViewController, UITableViewDelegate, UITableVi
             selectedIndex.append(indexPath.row)
             let hot = recipes[indexPath.item]["hot"] as! Int
             totalHot = hot + totalHot
-            recommand.text = String(format: "%d", totalHot) + "/" + String(format:"%d",Int(user.energyNeed))
+            recommand.text = "已选菜品:"+String(format: "%d", totalHot) + "/" + String(format:"%d",Int(user.energyNeed))
             if( totalHot>Int(user.energyNeed)){
                 recommand.textColor = UIColor.red.withAlphaComponent(0.7)
             }

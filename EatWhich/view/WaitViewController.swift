@@ -111,15 +111,15 @@ class WaitViewController: UIViewController, BMKLocationServiceDelegate, BMKPoiSe
         
             //访问服务器
             let headers = [
+                "authorization": "Basic eGp5OjIwMTcwNzI0",
                 "content-type": "application/json",
-                "authorization": "Basic eno6MjAxNzA3MzE=",
                 "cache-control": "no-cache",
-                "postman-token": "609cf8e1-cad3-dae1-8d6e-b1e459216599"
+                "postman-token": "ee43bdf3-ee2a-7154-7594-1a0a63de0eb1"
             ]
             //let parameters = ["energy": 800,"restaurants": [["name": "金马门国际美食百汇(珞喻路店)","distance": 450]]] as [String : Any]
             do{
                 let postData = try JSONSerialization.data(withJSONObject: parameters, options: [])
-                let request = NSMutableURLRequest(url: NSURL(string: "http://www.sgmy.site/eat/api/v1.0/recommand")! as URL,
+                let request = NSMutableURLRequest(url: NSURL(string: "http://www.sgmy.site/api/v2.0/recommand")! as URL,
                                                   cachePolicy: .useProtocolCachePolicy,
                                                   timeoutInterval: 10.0)
                 request.httpMethod = "PUT"

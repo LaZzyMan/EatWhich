@@ -11,8 +11,21 @@ import UIKit
 
 class EatRecord:NSObject{
     var date:Date!
-    var energyIn:Float!
-    var energyOut:Float!
+    var BMP:Float!
+    var energyIn:Float!{
+        get{
+            var sum:Float = 0
+            for r in recipe{
+                sum += r["hot"] as! Float
+            }
+            return sum
+        }
+    }
+    var energyOut:Float!{
+        get{
+            return (self.health.distanceEnergy + self.health.floorEnergy + self.BMP)*0.25
+        }
+    }
     var restaurant:[String:Any]!
     var recipe:[[String:Any]]!
     var location:CLLocationCoordinate2D!
@@ -30,20 +43,19 @@ class EatRecord:NSObject{
     }
     var health:HealthInfo!
     init(with json:AnyObject){
-        date = json.object(forKey: "date") as! Date
-        energyIn = json.object(forKey: "energyIn") as! Float
-        energyOut = json.object(forKey: "energyOut") as! Float
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd hh:mm"
+        date = dateFormatter.date(from: json.object(forKey: "date") as! String)
         recipe = json.object(forKey: "recipe") as! [[String:Any]]
         restaurant = json.object(forKey: "restaurant") as! [String:Any]
-        let coordinate = json.object(forKey: "location") as! [String:Any]
-        location = CLLocationCoordinate2D(latitude: coordinate["lat"] as! CLLocationDegrees, longitude: coordinate["lon"] as! CLLocationDegrees)
+        let coordinate = restaurant["location"] as! [String:Any]
+        location = CLLocationCoordinate2D(latitude: coordinate["lat"] as! CLLocationDegrees, longitude: coordinate["lng"] as! CLLocationDegrees)
         health = HealthInfo(with: json.object(forKey: "health") as AnyObject)
         super.init()
     }
     override init(){
         date = Date()
-        energyOut = 0
-        energyIn = 0
+        BMP = 0
         restaurant = [String:Any]()
         recipe = [[String:Any]]()
         location = CLLocationCoordinate2D()

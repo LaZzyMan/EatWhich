@@ -34,6 +34,8 @@ class mainViewController: UIViewController, UITableViewDelegate, UITableViewData
     override func viewWillAppear(_ animated: Bool) {
         
         super.viewWillAppear(animated)
+        self.view.setNeedsDisplay()
+        self.view.setNeedsLayout()
     }
     
     override func viewDidLoad() {
@@ -41,12 +43,14 @@ class mainViewController: UIViewController, UITableViewDelegate, UITableViewData
         // Do any additional setup after loading the view, typically from a nib.
         restaurantTableView.delegate = self
         restaurantTableView.dataSource = self
+        restaurantTableView.backgroundColor = UIColor.clear
         //设置按钮样式
         menuUp.backgroundColor = user.colorTheme
         blackFilter = UIView(frame: UIScreen.main.bounds)
         blackFilter.backgroundColor = UIColor.black.withAlphaComponent(0.5)
         blackFilter.isHidden = true
         aboveView.addSubview(blackFilter)
+        rightView.backgroundColor = UIColor.white.withAlphaComponent(0.7)
         menuButton.layer.cornerRadius = 25
         menuButton.layer.masksToBounds = true
         hunStyle.setTitleColor(user.colorTheme, for: .normal)
@@ -82,10 +86,11 @@ class mainViewController: UIViewController, UITableViewDelegate, UITableViewData
             self.backgroundImage.image = #imageLiteral(resourceName: "back2")
             rate.text = "少食"
         }
+        self.backgroundImage.image = #imageLiteral(resourceName: "ThemeBackground")
         supperRate.textColor = user.colorTheme
         rate.textColor = user.colorTheme
         //加载历史记录
-        user.getRestaurantHistory(number: 30)
+        //user.getRestaurantHistory(number: 30)
     }
     
     @IBAction func touch(_ sender: Any) {
@@ -111,12 +116,14 @@ class mainViewController: UIViewController, UITableViewDelegate, UITableViewData
                     self.blackFilter.isHidden = true
                     self.aboveView.center.x -= self.view.bounds.width*0.8
                     self.flag = 0
+                    return
                 }
                 if(self.flag == 0){
-                    self.rightView.center.x -= self.view.bounds.width*0.8
+                    self.rightView.center.x -= self.view.bounds.width*0.6
                     self.blackFilter.isHidden = false
-                    self.aboveView.center.x -= self.view.bounds.width*0.8
+                    //self.aboveView.center.x -= self.view.bounds.width*0.8
                     self.flag = 2
+                    return
                 }
             })
             
@@ -126,13 +133,15 @@ class mainViewController: UIViewController, UITableViewDelegate, UITableViewData
                     self.bottomView.center.x += self.view.bounds.width*0.8
                     self.blackFilter.isHidden = false
                     self.aboveView.center.x += self.view.bounds.width*0.8
-                    self.flag = 1;
+                    self.flag = 1
+                    return
                 }
                 if(self.flag == 2){
-                    self.rightView.center.x += self.view.bounds.width*0.8
+                    self.rightView.center.x += self.view.bounds.width*0.6
                     self.blackFilter.isHidden = true
-                    self.aboveView.center.x += self.view.bounds.width*0.8
+                    //self.aboveView.center.x += self.view.bounds.width*0.8
                     self.flag = 0
+                    return
                 }
             })
         }
@@ -192,7 +201,7 @@ class mainViewController: UIViewController, UITableViewDelegate, UITableViewData
                 a.user = self.user
             }
         }
-        if segue.identifier == "showCostumView"{
+        if segue.identifier == "showCustomView"{
             if let a = segue.destination as? CustomInputViewController{
                 a.user = self.user
                 
@@ -242,26 +251,67 @@ class mainViewController: UIViewController, UITableViewDelegate, UITableViewData
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let restaurant = user.historyRecord[indexPath.row]
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "YYYY-MM-dd"
-        let cell = restaurantTableView.dequeueReusableCell(withIdentifier: "restaurantCell", for: indexPath)
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let historyCell = tableView.dequeueReusableCell(withIdentifier: "restaurantCell") as! HistoryTableViewCell
+        historyCell.title.text! = restaurant.restaurant["name"] as! String
+        historyCell.timeLabel.text! = dateFormatter.string(from: restaurant.date)
+        historyCell.backgroundColor = UIColor.clear
         switch restaurant.state{
         case -1:
-            cell.imageView?.image = #imageLiteral(resourceName: "restaurantblue")
+            historyCell.RestImage.image = #imageLiteral(resourceName: "restaurantblue")
         case 1:
-            cell.imageView?.image = #imageLiteral(resourceName: "restaurantred")
+            historyCell.RestImage.image = #imageLiteral(resourceName: "restaurantred")
         default:
-            cell.imageView?.image = #imageLiteral(resourceName: "restaurantgreen")
+            historyCell.RestImage.image = #imageLiteral(resourceName: "restaurantgreen")
         }
-        cell.textLabel?.text = restaurant.restaurant["name"] as? String
-        cell.detailTextLabel?.text = dateFormatter.string(from: restaurant.date)
-        return cell
+        return historyCell
     }
     @IBAction func showDetailHistory(_ sender: Any) {
         self.performSegue(withIdentifier: "showDetailHistory", sender: self.user)
     }
     //清空历史记录
     @IBAction func deleteHistory(_ sender: Any) {
+        let headers = [
+            "authorization": "Basic eGp5OjIwMTcwNzI0",
+            "content-type": "application/json",
+            "cache-control": "no-cache",
+            "postman-token": "ee43bdf3-ee2a-7154-7594-1a0a63de0eb1"
+        ]
+        let parameters = [
+            "userID": user.userName
+            ] as [String : Any]
         
+        do{
+            let postData = try JSONSerialization.data(withJSONObject: parameters, options: [])
+            
+            let request = NSMutableURLRequest(url: NSURL(string: "http://www.sgmy.site/api/v2.0/deletehistory")! as URL,
+                                              cachePolicy: .useProtocolCachePolicy,
+                                              timeoutInterval: 10.0)
+            request.httpMethod = "PUT"
+            request.allHTTPHeaderFields = headers
+            request.httpBody = postData as Data
+            
+            let session = URLSession.shared
+            let dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in
+                if (error != nil) {
+                    NSLog(error.debugDescription)
+                } else {
+                    let json = try?JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.allowFragments) as AnyObject
+                    let status = json?.object(forKey: "result") as! String
+                    if status == "True"{
+                        let alertController = UIAlertController(title: "Warning",message: " 清空成功", preferredStyle: .alert)
+                        let cancelAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+                        alertController.addAction(cancelAction)
+                        self.present(alertController, animated: true, completion: nil)
+                        self.user.historyRecord = []
+                    }
+                }
+            })
+            dataTask.resume()
+        }
+        catch let error{
+            NSLog("JSON失败\(error)")
+        }
     }
 }
 

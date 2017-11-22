@@ -10,10 +10,8 @@ import UIKit
 
 class ViewController: UIViewController, UITextFieldDelegate{
     
+    @IBOutlet weak var progressView: UIActivityIndicatorView!
     @IBOutlet weak var loginStyle: UIButton!
-    @IBOutlet weak var mainImage: UIImageView!
-   
-    
     @IBOutlet weak var userName: UITextField!//
     @IBOutlet weak var passWord: UITextField!
     @IBOutlet weak var result_1: UILabel!//
@@ -25,44 +23,50 @@ class ViewController: UIViewController, UITextFieldDelegate{
         
         userName.delegate = self
         passWord.delegate = self
-        
-        
+        progressView.stopAnimating()
+        Thread.sleep(forTimeInterval: 1.5)
         //设置按钮样式
+        /*
         loginStyle.layer.borderWidth = 2
         loginStyle.layer.masksToBounds = true
         loginStyle.layer.borderColor = UIColor(red: 25/255, green: 148/255, blue: 117/255, alpha: 0.8).cgColor
         loginStyle.layer.cornerRadius = 12
         //设置图片圆形显示
+        
         mainImage.layer.cornerRadius = 60
         mainImage.layer.masksToBounds = true
         mainImage.layer.borderWidth = 0
         mainImage.layer.borderColor = UIColor(red: 25/255, green: 148/255, blue: 117/255, alpha: 0.8).cgColor
+ */
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
 
     }
-
-    //显示密码
-    @IBAction func eyeLook(_ sender: Any) {
-        passWord.isSecureTextEntry = false
-    }
     
     //登录按钮
     @IBAction func login_Click(_ sender: Any) {
+        self.view.isUserInteractionEnabled = false
+        self.progressView.startAnimating()
+        
         let username = userName.text!
         let password = passWord.text!
-        let parameters = ["username":username,"password":password] as [String : Any]
         let headers = [
+            "authorization": "Basic eGp5OjIwMTcwNzI0",
             "content-type": "application/json",
-            "authorization": "Basic eno6MjAxNzA3MzE=",
             "cache-control": "no-cache",
-            "postman-token": "609cf8e1-cad3-dae1-8d6e-b1e459216599"
+            "postman-token": "ee43bdf3-ee2a-7154-7594-1a0a63de0eb1"
         ]
+        let parameters = [
+            "userID": username,
+            "password": password
+            ] as [String : Any]
+        
         do{
             let postData = try JSONSerialization.data(withJSONObject: parameters, options: [])
-            let request = NSMutableURLRequest(url: NSURL(string: "http://www.sgmy.site/eat/api/v1.0/login")! as URL,
+            
+            let request = NSMutableURLRequest(url: NSURL(string: "http://www.sgmy.site/api/v2.0/login")! as URL,
                                               cachePolicy: .useProtocolCachePolicy,
                                               timeoutInterval: 10.0)
             request.httpMethod = "PUT"
@@ -75,16 +79,17 @@ class ViewController: UIViewController, UITextFieldDelegate{
                     NSLog(error.debugDescription)
                 } else {
                     let json = try?JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.allowFragments) as AnyObject
-                    let status = json?.object(forKey: "status") as! Int
-                    if status == 0{
-                        let alertController = UIAlertController(title: "系统提示",message: "用户名或密码错误！", preferredStyle: .alert)
-                        let cancelAction = UIAlertAction(title: "确定", style: .cancel, handler: nil)
+                    let status = json?.object(forKey: "result") as! String
+                    if status != "True"{
+                        let alertController = UIAlertController(title: "Warning",message: status, preferredStyle: .alert)
+                        let cancelAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
                         alertController.addAction(cancelAction)
                         self.present(alertController, animated: true, completion: nil)
                         self.userName.text = ""
                         self.passWord.text = ""
                     }else{
                         self.userLogin.initWithJson(with: json?.object(forKey: "user") as AnyObject)
+                        self.progressView.stopAnimating()
                         self.performSegue(withIdentifier: "myLogin", sender: self)
                     }
                 }

@@ -9,45 +9,19 @@
 import UIKit
 import Charts
 
-class HistoryViewController: UIViewController, BMKMapViewDelegate, BMKLocationServiceDelegate {
-
-    @IBOutlet weak var weekView: LineChartView!
-    @IBOutlet weak var monthView: LineChartView!
-    @IBOutlet weak var transformer: UISegmentedControl!
-    @IBOutlet weak var map: UIView!
+class HistoryViewController: UIViewController{
     @IBOutlet weak var data: UIView!
-    var mapView:BMKMapView!
-    var locationService:BMKLocationService!
     var user:User!
+    let colorSet = [UIColor(red: 208/255, green: 217/255, blue: 224/255, alpha: 0.7), UIColor(red: 133 / 255.0, green: 207 / 255.0, blue: 213 / 255.0, alpha: 0.7), UIColor(red: 30/255, green: 161/255, blue: 177/255, alpha: 0.7)]
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        mapView = BMKMapView()
-        locationService = BMKLocationService()
-        map.center.x += self.view.bounds.width
-        map.addSubview(mapView)
         displayDataView()
-    }
-    override func viewWillAppear(_ animated: Bool) {
-        mapView.delegate = self
-        locationService.delegate = self
-    }
-    override func viewWillDisappear(_ animated: Bool) {
-        mapView.delegate = nil
-        locationService.delegate = nil
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
-    }
-    @IBAction func transform(_ sender: Any) {
-        switch self.transformer.selectedSegmentIndex {
-        case 1:
-            displayMapView()
-        default:
-            displayDataView()
-        }
     }
     
     @IBAction func detailHistoryBack(_ sender: Any) {
@@ -60,68 +34,54 @@ class HistoryViewController: UIViewController, BMKMapViewDelegate, BMKLocationSe
             }
         }
     }
-    func displayMapView(){
-        map.center.x -= self.view.bounds.width
-        map.center.x += self.view.bounds.width
-        locationService.startUserLocationService()
-        mapView.showsUserLocation = true
-        mapView.isBuildingsEnabled = false
-        for record in user.historyRecord{
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "MMM,dd,YYYY"
-            let annotion = BMKPointAnnotation()
-            annotion.coordinate = record.location
-            annotion.title = record.restaurant["name"] as! String
-            annotion.subtitle = dateFormatter.string(from: record.date)
-        }
-    }
     func displayDataView(){
-        map.center.x += self.view.bounds.width
-        data.center.x += self.view.bounds.width
-        //week
-        let weekDatasetIn = LineChartDataSet()
-        let weekDatasetOut = LineChartDataSet()
-        for i in 0...7{
-            weekDatasetIn.addEntry(ChartDataEntry(x: i as! Double, y: user.historyRecord[i].energyIn as! Double))
-            weekDatasetOut.addEntry(ChartDataEntry(x: i as! Double, y: user.historyRecord[i].energyOut as! Double))
-        }
-        weekDatasetIn.drawFilledEnabled = true
-        weekDatasetOut.drawFilledEnabled = true
-        weekDatasetIn.mode = .cubicBezier
-        weekDatasetOut.mode = .cubicBezier
-        weekView.data = LineChartData(dataSets: [weekDatasetIn,weekDatasetOut])
-        //momth
-        let monthDatasetIn = LineChartDataSet()
-        let monthDatasetOut = LineChartDataSet()
-        for i in 0...30{
-            monthDatasetIn.addEntry(ChartDataEntry(x: i as! Double, y: user.historyRecord[i].energyIn as! Double))
-            monthDatasetOut.addEntry(ChartDataEntry(x: i as! Double, y: user.historyRecord[i].energyOut as! Double))
-        }
-        monthDatasetIn.drawFilledEnabled = true
-        monthDatasetOut.drawFilledEnabled = true
-        monthDatasetIn.mode = .cubicBezier
-        monthDatasetOut.mode = .cubicBezier
-        monthView.data = LineChartData(dataSets: [monthDatasetIn,monthDatasetOut])
+        initLineChart(days: 7, frame: CGRect(x: 0, y: 95, width: 375, height: 270))
+        initLineChart(days: 30, frame: CGRect(x: 0, y: 397, width: 375, height: 270))
     }
-    func mapView(_ mapView: BMKMapView!, viewFor annotation: BMKAnnotation!) -> BMKAnnotationView! {
-        let AnnotationViewID = "renameMark"
-        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: AnnotationViewID) as! BMKPinAnnotationView?
-        if annotationView == nil {
-            annotationView = BMKPinAnnotationView(annotation: annotation, reuseIdentifier: AnnotationViewID)
-            // 设置颜色
-            annotationView!.pinColor = UInt(BMKPinAnnotationColorRed)
-            // 设置可拖拽
-            annotationView!.isDraggable = false
-            // 从天上掉下的动画
-            annotationView!.animatesDrop = true
+    
+    func initLineChart(days:Int, frame:CGRect){
+        //data
+        var entrySet1 = [ChartDataEntry]()
+        var entrySet2 = [ChartDataEntry]()
+        for i in 0...days{
+            entrySet1.append(ChartDataEntry(x: Double(i), y: Double(user.historyRecord[i].energyIn)))
+            entrySet2.append(ChartDataEntry(x: Double(i), y: Double(user.historyRecord[i].energyOut)))
         }
-        annotationView?.annotation = annotation
-        annotationView?.canShowCallout = true
-        return annotationView
-    }
-    func didUpdate(_ userLocation: BMKUserLocation!) {
-        mapView.updateLocationData(userLocation)
-        
+        let lineDataset1 = LineChartDataSet(values: entrySet1, label: "摄入热量")
+        let lineDataset2 = LineChartDataSet(values: entrySet2, label: "消耗热量")
+        let LineView = LineChartView(frame: frame)
+        let data = LineChartData(dataSets: [lineDataset1, lineDataset2])
+        LineView.data = data
+        self.data.addSubview(LineView)
+        //view        LineView.chartDescription?.text = "最近\(days)天晚餐历史统计"
+        LineView.chartDescription?.enabled = true
+        LineView.chartDescription?.font = UIFont(name: "FZQingKeBenYueSongS-R-GB", size: 17.0)!
+        LineView.chartDescription?.position = CGPoint(x: frame.minX+5.0, y: frame.minY+5.0)
+        LineView.rightAxis.drawLabelsEnabled = false
+        LineView.xAxis.labelPosition = .bottom
+        LineView.drawGridBackgroundEnabled = false
+        lineDataset1.drawValuesEnabled = false
+        lineDataset2.drawValuesEnabled = false
+        lineDataset1.drawFilledEnabled = true
+        lineDataset2.drawFilledEnabled = true
+        lineDataset1.fillColor = colorSet[0]
+        lineDataset2.fillColor = colorSet[2]
+        lineDataset1.fillAlpha = 0.7
+        lineDataset2.fillAlpha = 0.7
+        lineDataset1.drawCirclesEnabled = false
+        lineDataset2.drawCirclesEnabled = false
+        lineDataset1.mode = .cubicBezier
+        lineDataset2.mode = .cubicBezier
+        lineDataset1.colors = [colorSet[0]]
+        lineDataset2.colors = [colorSet[2]]
+        LineView.chartDescription?.text = ""
+        LineView.legend.font = UIFont(name: "FZQingKeBenYueSongS-R-GB", size: 10.0)!
+        LineView.legend.horizontalAlignment = .right
+        LineView.legend.verticalAlignment = .bottom
+        LineView.legend.orientation = .vertical
+        LineView.legend.form = .line
+        LineView.animate(yAxisDuration: 1.4)
+        LineView.notifyDataSetChanged()
     }
     
     /*

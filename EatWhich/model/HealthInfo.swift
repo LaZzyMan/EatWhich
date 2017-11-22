@@ -75,9 +75,10 @@ class HealthInfo: NSObject ,NSCoding{
         super.init()
     }
     init(with json:AnyObject){
-        distance = json.object(forKey: "distance") as! Float
-        floors = json.object(forKey: "floors") as! Int32
-        steps = json.object(forKey: "steps") as! Int32
+        let healthInfo = (json as! [[String:Any]])[0]
+        distance = (healthInfo["distance"] as! Float)/1000
+        floors = healthInfo["floors"] as! Int32
+        steps = healthInfo["step"] as! Int32
         super.init()
     }
 
