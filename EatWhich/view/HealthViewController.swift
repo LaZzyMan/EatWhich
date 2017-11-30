@@ -26,6 +26,7 @@ class HealthViewController: UIViewController {
    
     override func viewDidLoad() {
         super.viewDidLoad()
+        stasticView.isHidden = true
         let baseUseNum = user.BMR
         let sportUseNum = user.healthInfo.energy
         baseUse.text! = "基本消耗"+String(Int(baseUseNum))+"KCal"

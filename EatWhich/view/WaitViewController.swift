@@ -9,7 +9,7 @@
 import UIKit
 
 class WaitViewController: UIViewController, BMKLocationServiceDelegate, BMKPoiSearchDelegate {
-    
+    //加载页面
     var user: User!
     var locationService:BMKLocationService!
     var pageList: [PageViewController]!
@@ -21,9 +21,10 @@ class WaitViewController: UIViewController, BMKLocationServiceDelegate, BMKPoiSe
         pageList = [PageViewController]()
         locationService = BMKLocationService()
         search = BMKPoiSearch()
-        locationService.startUserLocationService()
+         DispatchQueue.main.async(execute: {
+            self.locationService.startUserLocationService()
+         })
 
-        // Do any additional setup after loading the view.
         //创建加载动画
         self.view.backgroundColor = UIColor.white
         let layer = self.view.layer
@@ -84,17 +85,22 @@ class WaitViewController: UIViewController, BMKLocationServiceDelegate, BMKPoiSe
         search.delegate = nil
     }
     
+    //定位数据获取监听
     func didUpdate(_ userLocation: BMKUserLocation!) {
+        //获得手机定位信息
         currentLocation = userLocation.location.coordinate
         let option = BMKNearbySearchOption()
         option.pageIndex = 0
         option.pageCapacity = 100
         option.location = currentLocation
         option.keyword = "餐厅"
-        if !search.poiSearchNear(by: option){
-            NSLog("Search Failed")
-        }
+        DispatchQueue.main.async(execute: {
+            if !self.search.poiSearchNear(by: option){
+                NSLog("Search Failed")
+            }
+        })
     }
+    
     //poi搜索结果监听
     func onGetPoiResult(_ searcher: BMKPoiSearch!, result poiResult: BMKPoiResult!, errorCode: BMKSearchErrorCode) {
         if errorCode == BMK_SEARCH_NO_ERROR {
@@ -107,53 +113,57 @@ class WaitViewController: UIViewController, BMKLocationServiceDelegate, BMKPoiSe
                 let distance = Int(fromPoint.distance(from: toPoint))
                 poiNameAndDistance.append(["name":poi.name, "distance":distance])
             }
-            let parameters = ["restaurants":poiNameAndDistance,"energy":user.energyNeed] as [String : Any]
-        
-            //访问服务器
-            let headers = [
-                "authorization": "Basic eGp5OjIwMTcwNzI0",
-                "content-type": "application/json",
-                "cache-control": "no-cache",
-                "postman-token": "ee43bdf3-ee2a-7154-7594-1a0a63de0eb1"
-            ]
-            //let parameters = ["energy": 800,"restaurants": [["name": "金马门国际美食百汇(珞喻路店)","distance": 450]]] as [String : Any]
-            do{
-                let postData = try JSONSerialization.data(withJSONObject: parameters, options: [])
-                let request = NSMutableURLRequest(url: NSURL(string: "http://www.sgmy.site/api/v2.0/recommand")! as URL,
-                                                  cachePolicy: .useProtocolCachePolicy,
-                                                  timeoutInterval: 10.0)
-                request.httpMethod = "PUT"
-                request.allHTTPHeaderFields = headers
-                request.httpBody = postData as Data
+            DispatchQueue.main.async(execute: {
+                let parameters = ["restaurants":poiNameAndDistance,"energy":self.user.energyNeed] as [String : Any]
                 
-                let session = URLSession.shared
-                let dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in
-                    if (error != nil) {
-                        NSLog(error.debugDescription)
-                        self.performSegue(withIdentifier: "showRecommand", sender: self)
-                    } else {
-                        let json = try?JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.allowFragments) as AnyObject
-                        for i in 0..<3{
-                            let restaurant = json?.object(forKey: String(i)) as AnyObject
-                            let storyboard = UIStoryboard(name: "Main", bundle: nil)
-                            let pViewController = storyboard.instantiateViewController(withIdentifier: "PageViewController") as! PageViewController
-                            pViewController.restaurant = restaurant
-                            pViewController.poi = poiInfo[restaurant.object(forKey: "index") as! Int]
-                            pViewController.color = UIColor.white.withAlphaComponent(0.1)
-                            pViewController.currentLocation = self.currentLocation
-                            pViewController.user = self.user
-                            self.pageList.append(pViewController)
+                //访问服务器
+                let headers = [
+                    "authorization": "Basic eGp5OjIwMTcwNzI0",
+                    "content-type": "application/json",
+                    "cache-control": "no-cache",
+                    "postman-token": "ee43bdf3-ee2a-7154-7594-1a0a63de0eb1"
+                ]
+                //let parameters = ["energy": 800,"restaurants": [["name": "金马门国际美食百汇(珞喻路店)","distance": 450]]] as [String : Any]
+                do{
+                    let postData = try JSONSerialization.data(withJSONObject: parameters, options: [])
+                    let request = NSMutableURLRequest(url: NSURL(string: "http://www.sgmy.site/api/v2.0/recommand")! as URL,
+                                                      cachePolicy: .useProtocolCachePolicy,
+                                                      timeoutInterval: 10.0)
+                    request.httpMethod = "PUT"
+                    request.allHTTPHeaderFields = headers
+                    request.httpBody = postData as Data
+                    
+                    let session = URLSession.shared
+                    let dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in
+                        if (error != nil) {
+                            NSLog(error.debugDescription)
+                            self.performSegue(withIdentifier: "showRecommand", sender: self)
+                        } else {
+                            let json = try?JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.allowFragments) as AnyObject
+                            for i in 0..<3{
+                                let restaurant = json?.object(forKey: String(i)) as AnyObject
+                                let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                                let pViewController = storyboard.instantiateViewController(withIdentifier: "PageViewController") as! PageViewController
+                                pViewController.restaurant = restaurant
+                                NSLog("\(restaurant.object(forKey: "index") as! Int)")
+                                pViewController.poi = poiInfo[restaurant.object(forKey: "index") as! Int]
+                                NSLog(pViewController.poi.name)
+                                pViewController.color = UIColor.white.withAlphaComponent(0.1)
+                                pViewController.currentLocation = self.currentLocation
+                                pViewController.user = self.user
+                                self.pageList.append(pViewController)
+                            }
+                            DispatchQueue.main.async(execute: {
+                                self.performSegue(withIdentifier: "showRecommand", sender: self)
+                            })
                         }
-                        self.performSegue(withIdentifier: "showRecommand", sender: self)
-                    }
-                })
-                dataTask.resume()
-            }
-            catch let error{
-                NSLog("JSON失败\(error)")
-                
-            }
-            
+                    })
+                    dataTask.resume()
+                }
+                catch let error{
+                    NSLog("JSON失败\(error)")
+                }
+            })
             //let detailOption = BMKPoiDetailSearchOption()
         }
     }

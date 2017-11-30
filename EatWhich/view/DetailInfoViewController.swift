@@ -9,7 +9,6 @@
 import UIKit
 
 class DetailInfoViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-    var swipeLeft :UISwipeGestureRecognizer!;   // 左滑手势
     var user:User!
     var restaurant:AnyObject!
     var recipes:[[String:Any]]!
@@ -32,9 +31,6 @@ class DetailInfoViewController: UIViewController, UITableViewDelegate, UITableVi
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var recommand: UILabel!
     @IBOutlet weak var chooseView: UIView!
-    @IBOutlet weak var ofo: UIImageView!
-    @IBOutlet weak var meituan: UIImageView!
-    @IBOutlet weak var didi: UIImageView!
     override func viewDidLoad() {
         super.viewDidLoad()
         chooseView.layer.cornerRadius = 20
@@ -63,23 +59,10 @@ class DetailInfoViewController: UIViewController, UITableViewDelegate, UITableVi
         recommand.text = "已选菜品:" + "0/"+String(format:"%d",Int(user.energyNeed))
         tableView.delegate = self
         tableView.dataSource = self
-        
-        swipeLeft = UISwipeGestureRecognizer(target:self, action: #selector(DetailInfoViewController.swipe(_:)))
-        swipeLeft.direction = UISwipeGestureRecognizerDirection.left
-        self.view.addGestureRecognizer(swipeLeft)
 
         // Do any additional setup after loading the view.
     }
-    @IBAction func hideImage(_ sender: Any) {
-        didi.isHidden = true
-        ofo.isHidden = true
-        meituan.isHidden = true
-    }
-    func swipe(_ recognizer:UISwipeGestureRecognizer){
-        didi.isHidden = true
-        ofo.isHidden = true
-        meituan.isHidden = true
-    }
+   
     //delegate
     
     //dataSource
@@ -112,7 +95,7 @@ class DetailInfoViewController: UIViewController, UITableViewDelegate, UITableVi
             tableView.reloadData()
             let hot = recipes[indexPath.item]["hot"] as! Int
             totalHot = totalHot - hot
-            recommand.text = String(format: "%d", totalHot) + "/" + String(format:"%d",Int(user.energyNeed))
+            recommand.text = "已选菜品:" + String(format: "%d", totalHot) + "/" + String(format:"%d",Int(user.energyNeed))
             if( totalHot<Int(user.energyNeed)){
                 recommand.textColor = UIColor.white
             }
@@ -143,13 +126,52 @@ class DetailInfoViewController: UIViewController, UITableViewDelegate, UITableVi
         self.performSegue(withIdentifier: "beginNavigation", sender: self)
     }
     @IBAction func didi(_ sender: Any) {
-        didi.isHidden = false
+        let urlStr = "alipay://platformapi/startapp?appId=20000778"
+        let encodeUrlString = urlStr.addingPercentEncoding(withAllowedCharacters:
+            .urlQueryAllowed)
+        if let url = URL(string: encodeUrlString!) {
+            //根据iOS系统版本，分别处理
+            if #available(iOS 10, *) {
+                UIApplication.shared.open(url, options: [:],
+                                          completionHandler: {
+                                            (success) in
+                })
+            } else {
+                UIApplication.shared.openURL(url)
+            }
+        }
     }
     @IBAction func ofo(_ sender: Any) {
-        ofo.isHidden = false
+        let urlStr = "ofoapp://"
+        let encodeUrlString = urlStr.addingPercentEncoding(withAllowedCharacters:
+            .urlQueryAllowed)
+        if let url = URL(string: encodeUrlString!) {
+            //根据iOS系统版本，分别处理
+            if #available(iOS 10, *) {
+                UIApplication.shared.open(url, options: [:],
+                                          completionHandler: {
+                                            (success) in
+                })
+            } else {
+                UIApplication.shared.openURL(url)
+            }
+        }
     }
     @IBAction func meituan(_ sender: Any) {
-        meituan.isHidden = false
+        let urlStr = "eleme://"
+        let encodeUrlString = urlStr.addingPercentEncoding(withAllowedCharacters:
+            .urlQueryAllowed)
+        if let url = URL(string: encodeUrlString!) {
+            //根据iOS系统版本，分别处理
+            if #available(iOS 10, *) {
+                UIApplication.shared.open(url, options: [:],
+                                          completionHandler: {
+                                            (success) in
+                })
+            } else {
+                UIApplication.shared.openURL(url)
+            }
+        }
     }
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "beginNavigation"{

@@ -12,9 +12,9 @@ class ViewController: UIViewController, UITextFieldDelegate{
     
     @IBOutlet weak var progressView: UIActivityIndicatorView!
     @IBOutlet weak var loginStyle: UIButton!
+    @IBOutlet weak var errorInfoLabel: UILabel!
     @IBOutlet weak var userName: UITextField!//
     @IBOutlet weak var passWord: UITextField!
-    @IBOutlet weak var result_1: UILabel!//
     var userLogin:User = User()
     var path:URL = URL(fileURLWithPath: "")
     
@@ -24,6 +24,7 @@ class ViewController: UIViewController, UITextFieldDelegate{
         userName.delegate = self
         passWord.delegate = self
         progressView.stopAnimating()
+        errorInfoLabel.isHidden = true
         Thread.sleep(forTimeInterval: 1.5)
         //设置按钮样式
         /*
@@ -49,7 +50,13 @@ class ViewController: UIViewController, UITextFieldDelegate{
     @IBAction func login_Click(_ sender: Any) {
         self.view.isUserInteractionEnabled = false
         self.progressView.startAnimating()
-        
+        //创建新线程登陆服务
+        DispatchQueue.main.async(execute: {
+            self.login()
+        })
+    }
+    //登陆到服务器，返回0:成功，1:用户名密码错误，2:网络连接失败
+    func login(){
         let username = userName.text!
         let password = passWord.text!
         let headers = [
@@ -77,20 +84,30 @@ class ViewController: UIViewController, UITextFieldDelegate{
             let dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in
                 if (error != nil) {
                     NSLog(error.debugDescription)
+                    DispatchQueue.main.async(execute: {
+                        self.errorInfoLabel.isHidden = false
+                        self.errorInfoLabel.text = "网络错误"
+                        self.progressView.stopAnimating()
+                        self.view.isUserInteractionEnabled = true
+                        })
                 } else {
                     let json = try?JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.allowFragments) as AnyObject
                     let status = json?.object(forKey: "result") as! String
                     if status != "True"{
-                        let alertController = UIAlertController(title: "Warning",message: status, preferredStyle: .alert)
-                        let cancelAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
-                        alertController.addAction(cancelAction)
-                        self.present(alertController, animated: true, completion: nil)
-                        self.userName.text = ""
-                        self.passWord.text = ""
+                        DispatchQueue.main.async(execute: {
+                            self.userName.text = ""
+                            self.passWord.text = ""
+                            self.errorInfoLabel.isHidden = false
+                            self.errorInfoLabel.text = "用户名或密码错误！"
+                            self.progressView.stopAnimating()
+                            self.view.isUserInteractionEnabled = true
+                            })
                     }else{
                         self.userLogin.initWithJson(with: json?.object(forKey: "user") as AnyObject)
-                        self.progressView.stopAnimating()
-                        self.performSegue(withIdentifier: "myLogin", sender: self)
+                        DispatchQueue.main.async(execute: {
+                            self.progressView.stopAnimating()
+                            self.performSegue(withIdentifier: "myLogin", sender: self)
+                            })
                     }
                 }
             })
@@ -98,9 +115,13 @@ class ViewController: UIViewController, UITextFieldDelegate{
         }
         catch let error{
             NSLog("JSON失败\(error)")
+            DispatchQueue.main.async(execute: {
+                self.errorInfoLabel.isHidden = false
+                self.errorInfoLabel.text = "网络错误"
+                })
         }
     }
-    
+    //键盘回收
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
@@ -114,11 +135,11 @@ class ViewController: UIViewController, UITextFieldDelegate{
     @IBAction func finishEdit(_ sender: Any) {
         self.passWord.resignFirstResponder()
     }
+    //注册按钮相应
     @IBAction func register_Click(_ sender: UIButton) {
         self.performSegue(withIdentifier: "toRegister", sender: self)
 
     }
-    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "myLogin" {
             if let a = segue.destination as? mainViewController {

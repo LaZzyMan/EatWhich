@@ -102,5 +102,7 @@ class EditInforViewController: UIViewController,UITextFieldDelegate {
             }
         }
     }
-  
+    @IBAction func back(_ sender: Any) {
+        self.performSegue(withIdentifier: "backToInfo", sender: self)    }
+    
 }

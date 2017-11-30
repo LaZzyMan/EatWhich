@@ -59,9 +59,9 @@ class CustomInputViewController: UIViewController,UIPickerViewDelegate,UIPickerV
         case 0:
             myImage.image = #imageLiteral(resourceName: "adjustOp_1")
         case 1:
-            myImage.image = #imageLiteral(resourceName: "adjustOp_2")
-        case 2:
             myImage.image = #imageLiteral(resourceName: "adjustOp_3")
+        case 2:
+            myImage.image = #imageLiteral(resourceName: "adjustOp_2")
         default:
             break;
         }

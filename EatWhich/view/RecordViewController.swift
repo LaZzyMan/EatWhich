@@ -8,13 +8,15 @@
 
 import UIKit
 import Charts
-class RecordViewController: UIViewController, BMKLocationServiceDelegate{
+class RecordViewController: UIViewController, BMKLocationServiceDelegate, JNStarReteViewDelegate{
     var record:EatRecord!
     var user:User!
     var locationService:BMKLocationService!
     var location:CLLocationCoordinate2D!
     let colorSet = [UIColor(red: 208/255, green: 217/255, blue: 224/255, alpha: 0.7), UIColor(red: 133 / 255.0, green: 207 / 255.0, blue: 213 / 255.0, alpha: 0.7), UIColor(red: 30/255, green: 161/255, blue: 177/255, alpha: 0.7)]
 
+    @IBOutlet weak var mainView: UIView!
+    @IBOutlet weak var rateView: UIView!
     @IBOutlet weak var datelabel: UILabel!
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var timeLabel: UILabel!
@@ -23,6 +25,11 @@ class RecordViewController: UIViewController, BMKLocationServiceDelegate{
     @IBOutlet weak var progressView: UIActivityIndicatorView!
     override func viewDidLoad() {
         super.viewDidLoad()
+        rateView.isHidden = true
+        rateView.layer.cornerRadius = 5
+        rateView.layer.masksToBounds = true
+        rateView.layer.borderWidth = 2
+        rateView.layer.borderColor = UIColor.black.cgColor
 
         // Do any additional setup after loading the view.
         locationService = BMKLocationService()
@@ -51,7 +58,7 @@ class RecordViewController: UIViewController, BMKLocationServiceDelegate{
             entrySet.append(entry)
         }
         let CharView = PieChartView(frame: CGRect(x: 0, y: 300, width: 187, height: 250))
-        self.view.addSubview(CharView)
+        self.mainView.addSubview(CharView)
         let inEnergyDataset = PieChartDataSet(values: entrySet, label: "")
         let data = PieChartData(dataSet: inEnergyDataset)
         CharView.data = data
@@ -86,7 +93,7 @@ class RecordViewController: UIViewController, BMKLocationServiceDelegate{
         entrySet.append(PieChartDataEntry(value: Double(record.health.floorEnergy), label: "爬楼"))
         entrySet.append(PieChartDataEntry(value: Double(user.BMR), label: "基础消耗"))
         let CharView = PieChartView(frame: CGRect(x: 188, y: 300, width: 187, height: 250))
-        self.view.addSubview(CharView)
+        self.mainView.addSubview(CharView)
         let inEnergyDataset = PieChartDataSet(values: entrySet, label: "")
         let data = PieChartData(dataSet: inEnergyDataset)
         CharView.data = data
@@ -115,6 +122,7 @@ class RecordViewController: UIViewController, BMKLocationServiceDelegate{
         CharView.chartDescription?.text = ""
         CharView.notifyDataSetChanged()
     }
+    
     func initBarChart(){
         //data
         
@@ -127,7 +135,7 @@ class RecordViewController: UIViewController, BMKLocationServiceDelegate{
         let BarView = HorizontalBarChartView(frame: CGRect(x: 16, y: 100, width: 230, height: 170))
         let data = BarChartData(dataSets: [barDataset1, barDataset2])
         BarView.data = data
-        self.view.addSubview(BarView)
+        self.mainView.addSubview(BarView)
         //view
         barDataset1.colors = [colorSet[0]]
         barDataset2.colors = [colorSet[1]]
@@ -170,6 +178,17 @@ class RecordViewController: UIViewController, BMKLocationServiceDelegate{
         self.view.isUserInteractionEnabled = false
         locationService.startUserLocationService()
     }
+    @IBAction func showRateView(_ sender: Any) {
+        rateView.isHidden = false
+        self.rateView.becomeFirstResponder()
+        let starView = JNStarRateView.init(frame: CGRect(x: 20,y: 60,width: 280,height: 50), starCount: 5, score: 0)
+        //        starView.userInteractionEnabled = false//不支持用户操作
+        starView.delegate = self
+        starView.usePanAnimation = true
+        starView.allowUserPan = true//滑动评星
+        //        starView.allowUnderCompleteStar = false // 完整星星
+        self.rateView.addSubview(starView)
+    }
     @IBAction func backToMain(_ sender: Any) {
         self.performSegue(withIdentifier: "historyBack", sender: nil)
     }
@@ -192,6 +211,14 @@ class RecordViewController: UIViewController, BMKLocationServiceDelegate{
             }
         }
     }
+    //starView Delegate
+    func starRate(view starRateView: JNStarRateView, score: Float) {
+        
+    }
+    @IBAction func finishRate(_ sender: Any) {
+        rateView.isHidden = true
+    }
+    
     
 
     /*

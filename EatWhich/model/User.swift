@@ -67,10 +67,9 @@ class User: NSObject{
             }
         }
     }
-    /*
     func encode(with aCoder: NSCoder) {
         aCoder.encode(userName, forKey:"userName")
-        aCoder.encode(passWord, forKey:"passWord")
+        //aCoder.encode(passWord, forKey:"passWord")
         aCoder.encode(healthInfo,forKey:"healthInfo")
         aCoder.encode(birthday,forKey:"birthday")
         aCoder.encode(name, forKey:"name")
@@ -83,7 +82,7 @@ class User: NSObject{
     }
     required init?(coder aDecoder: NSCoder) {
         userName = aDecoder.decodeObject(forKey: "userName") as! String
-        passWord = aDecoder.decodeObject(forKey: "passWord") as! String
+        //passWord = aDecoder.decodeObject(forKey: "passWord") as! String
         name = aDecoder.decodeObject(forKey: "name") as! String
         healthInfo = aDecoder.decodeObject(forKey: "healthInfo") as! HealthInfo
         headImage = aDecoder.decodeObject(forKey: "headImage") as! UIImage
@@ -96,7 +95,7 @@ class User: NSObject{
         gender = g == "男" ? true : false
         
         super.init()
-    }*/
+    }
     override init() {
         healthInfo = HealthInfo()
         userName = ""
@@ -110,7 +109,7 @@ class User: NSObject{
         super.init()
         
     }
-    /*
+    
     func documentsDirectory()  -> URL {
         let paths = FileManager.default.urls( for: .documentDirectory,
                                               in: .userDomainMask)
@@ -125,7 +124,7 @@ class User: NSObject{
         archiver.encode(self, forKey: self.userName)
         archiver.finishEncoding()
         data.write(to: dataFilePath(), atomically: true)
-    }*/
+    }
     //登录时初始化数据
     func initWithJson(with json:AnyObject?){
         let dateFormatter = DateFormatter()

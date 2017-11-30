@@ -180,13 +180,12 @@ class mainViewController: UIViewController, UITableViewDelegate, UITableViewData
         self.performSegue(withIdentifier: "toHealth_1", sender: self)
     }
     
-    //跳转到帮助界面
-    @IBAction func toHelp(_ sender: UIButton) {
-        self.performSegue(withIdentifier: "toHelp_1", sender: self)
+    //跳转到好友界面
+    @IBAction func toFriend(_ sender: UIButton) {
+        self.performSegue(withIdentifier: "toFriend", sender: self)
 
     }
     
-
     @IBAction func toSupper(_ sender: Any) {
         self.performSegue(withIdentifier: "toSupper", sender: self)
     }
@@ -210,13 +209,11 @@ class mainViewController: UIViewController, UITableViewDelegate, UITableViewData
         if segue.identifier == "toHealth_1"{
             if let a = segue.destination as? HealthViewController{
                 a.user = self.user
-                
             }
         }
-        if segue.identifier == "toHelp_1"{
-            if let a = segue.destination as? HelpViewController{
+        if segue.identifier == "toFriend"{
+            if let a = segue.destination as? FriendViewController{
                 a.user = self.user
-                
             }
         }
         if segue.identifier == "toAbout_1"{

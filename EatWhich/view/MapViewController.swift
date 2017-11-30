@@ -22,35 +22,36 @@ class MapViewController: UIViewController, BMKMapViewDelegate, UIPageViewControl
     @IBOutlet weak var containView: UIView!
     @IBOutlet weak var pageController: UIPageControl!
     @IBOutlet weak var waitView: UIView!
-    @IBOutlet weak var waitProgress: UIActivityIndicatorView!
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        //设置地图样式
         let stylePath = Bundle.main.path(forResource: "mapConfig", ofType: "")
         BMKMapView.customMapStyle(stylePath)
-        
-        routeSearch = BMKRouteSearch()
-        mapView = BMKMapView(frame: map.frame)
-        self.map.addSubview(mapView)
         BMKMapView.enableCustomMapStyle(true)
-        //mapView.isBuildingsEnabled = false
-        //locationService.startUserLocationService()
-        //mapView.showsUserLocation = false
-        mapView.userTrackingMode = BMKUserTrackingModeFollow
-        //mapView.showsUserLocation = true
-        //blackFilter.backgroundColor = UIColor.black.withAlphaComponent(0.4)
-        
-        pageViewController = self.childViewControllers.first as! UIPageViewController
-        pageViewController.delegate = self;
-        pageViewController.dataSource = self;
-        pageViewController.setViewControllers([pageList[0] as UIViewController] , direction: .forward, animated: false, completion: nil)
-        self.pageController.currentPage = 0
-        
+        mapView = BMKMapView(frame: map.frame)
         //ui更新
         //self.containView.layer.cornerRadius = 20
         //self.containView.layer.masksToBounds = true
         //self.containView.backgroundColor = UIColor.white.withAlphaComponent(0.2)
         self.mapView.isBuildingsEnabled = false
+        //mapView.isBuildingsEnabled = false
+        //locationService.startUserLocationService()
+        //mapView.showsUserLocation = false
+        mapView.userTrackingMode = BMKUserTrackingModeFollow
+        mapView.isZoomEnabled = true
+        mapView.isOverlookEnabled = true
+        mapView.isScrollEnabled = true
+        mapView.becomeFirstResponder()
+        //mapView.showsUserLocation = true
+        //blackFilter.backgroundColor = UIColor.black.withAlphaComponent(0.4)
+        routeSearch = BMKRouteSearch()
+        self.map.addSubview(mapView)
+        //初始化轮播窗口
+        pageViewController = self.childViewControllers.first as! UIPageViewController
+        pageViewController.delegate = self;
+        pageViewController.dataSource = self;
+        pageViewController.setViewControllers([pageList[0] as UIViewController] , direction: .forward, animated: false, completion: nil)
+        self.pageController.currentPage = 0
         
         //创建加载动画
         self.waitView.backgroundColor = UIColor.white
@@ -96,44 +97,56 @@ class MapViewController: UIViewController, BMKMapViewDelegate, UIPageViewControl
             circle.add(animation, forKey: "animation")
             layer.addSublayer(circle)
         }
+        
+        //异步获取路径规划信息
         DispatchQueue.main.async(execute: {
             self.updateBackground()
             })
         //updateBackground()
     }
+    
     override func viewWillAppear(_ animated: Bool) {
         mapView.viewWillAppear()
         routeSearch.delegate = self
         //locationService.delegate = self
         mapView.delegate = self
     }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         mapView.region = BMKCoordinateRegionMake(mapView.centerCoordinate, BMKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02))
     }
+    
     override func viewWillDisappear(_ animated: Bool) {
         mapView.viewWillDisappear()
         //locationService.delegate = self
         routeSearch.delegate = nil
         mapView.delegate = nil
     }
+    
     //刷新背景页面
     func updateBackground(){
+        NSLog("\(self.pageController.currentPage)")
+        NSLog(self.pageList[self.pageController.currentPage].poi.name)
+        NSLog("\(self.pageList[self.pageController.currentPage].poi.pt.latitude)")
+        NSLog("\(self.pageList[self.pageController.currentPage].poi.pt.longitude)")
         let from = BMKPlanNode()
         from.pt = currentLocation
-        //from.name = "当前位置"
-        //from.cityName = "武汉"
+        from.name = "当前位置"
+        from.cityName = "武汉"
         let to = BMKPlanNode()
-        //to.name = pageList[self.pageController.currentPage].poi.name
-        //to.cityName = "武汉"
+        to.name = pageList[self.pageController.currentPage].poi.name
+        to.cityName = "武汉"
         to.pt = pageList[self.pageController.currentPage].poi.pt
         let walkingRouteSearchOption = BMKWalkingRoutePlanOption()
         walkingRouteSearchOption.from = from
         walkingRouteSearchOption.to = to
-        let flag = routeSearch.walkingSearch(walkingRouteSearchOption)
-        if !flag {
-            NSLog("步行检索发送失败")
-        }
+        DispatchQueue.main.async(execute: {
+            let flag = self.routeSearch.walkingSearch(walkingRouteSearchOption)
+            if !flag {
+                NSLog("步行检索发送失败")
+            }
+        })
     }
     /*
     func didUpdate(_ userLocation: BMKUserLocation!) {
@@ -202,14 +215,14 @@ class MapViewController: UIViewController, BMKMapViewDelegate, UIPageViewControl
                     i += 1
                 }
             }
-            
-            // 通过 points 构建 BMKPolyline
-            let polyLine = BMKPolyline(points: &tempPoints, count: UInt(planPointCounts))
-            mapView.add(polyLine)  // 添加路线 overlay
-            mapViewFitPolyLine(polyLine)
-            waitProgress.stopAnimating()
-            blackFilter.isUserInteractionEnabled = true
-            waitView.isHidden = true
+            DispatchQueue.main.async(execute: {
+                // 通过 points 构建 BMKPolyline
+                let polyLine = BMKPolyline(points: &tempPoints, count: UInt(planPointCounts))
+                self.mapView.add(polyLine)  // 添加路线 overlay
+                self.mapViewFitPolyLine(polyLine)
+                self.blackFilter.isUserInteractionEnabled = true
+                self.waitView.isHidden = true
+            })
         }
     }
     
@@ -220,8 +233,8 @@ class MapViewController: UIViewController, BMKMapViewDelegate, UIPageViewControl
         if self.pageController.currentPage == 2{
             return nil
         }
-        waitProgress.startAnimating()
         blackFilter.isUserInteractionEnabled = false
+        waitView.isHidden = false
         self.pageController.currentPage += 1
         DispatchQueue.main.async(execute: {
             self.updateBackground()
@@ -235,7 +248,7 @@ class MapViewController: UIViewController, BMKMapViewDelegate, UIPageViewControl
         if self.pageController.currentPage == 0{
             return nil
         }
-        waitProgress.startAnimating()
+        waitView.isHidden = false
         blackFilter.isUserInteractionEnabled = false
         self.pageController.currentPage -= 1
         DispatchQueue.main.async(execute: {
@@ -274,7 +287,6 @@ class MapViewController: UIViewController, BMKMapViewDelegate, UIPageViewControl
         return nil
     }
     
-
     func mapView(_ mapView: BMKMapView!, viewFor overlay: BMKOverlay!) -> BMKOverlayView! {
         if overlay as! BMKPolyline? != nil {
             let polylineView = BMKPolylineView(overlay: overlay as! BMKPolyline)
@@ -328,12 +340,8 @@ class MapViewController: UIViewController, BMKMapViewDelegate, UIPageViewControl
                 view?.image = image
             }
         }
-        
         return view
     }
-    
-    
-    
     
     //根据polyline设置地图范围
     func mapViewFitPolyLine(_ polyline: BMKPolyline!) {

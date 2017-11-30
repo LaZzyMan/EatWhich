@@ -9,14 +9,13 @@
 import UIKit
 
 class ThirdRegisterController: UIViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate{
-    
-    @IBOutlet weak var registerStyle: UIButton!
     var newUser:User = User()
     var password = String()
     var state = -1
     var identityCode:String?
     
-    //获取用户名和密码
+    @IBOutlet weak var registerStyle: UIButton!
+    @IBOutlet weak var errorInfoLabel: UILabel!
     @IBOutlet weak var progress: UIProgressView!
     @IBOutlet weak var labelMain: UILabel!
     @IBOutlet weak var info1: UITextField!
@@ -35,7 +34,8 @@ class ThirdRegisterController: UIViewController, UITextFieldDelegate, UIImagePic
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var identityTextField: UITextField!
     @IBOutlet weak var sendButton: UIButton!
-    
+    @IBOutlet weak var waitCircle: UIActivityIndicatorView!
+    //从相册选择图片或使用相机拍照
     @IBAction func chooseFromPhotos(_ sender: Any) {
         let actionSheet = UIAlertController(title: "上传头像", message: nil, preferredStyle: .actionSheet)
         let cancelBtn = UIAlertAction(title: "取消", style: .cancel, handler: nil)
@@ -74,7 +74,7 @@ class ThirdRegisterController: UIViewController, UITextFieldDelegate, UIImagePic
         actionSheet.addAction(selectPhotos)
         self.present(actionSheet, animated: true, completion: nil)
     }
-    
+    //选择图片窗口
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         
         let type: String = (info[UIImagePickerControllerMediaType] as! String)
@@ -97,7 +97,7 @@ class ThirdRegisterController: UIViewController, UITextFieldDelegate, UIImagePic
             ))
         }
     }
-    
+    //裁剪图片
     func fixOrientation(_ aImage: UIImage) -> UIImage {
         // No-op if the orientation is already correct
         if aImage.imageOrientation == .up {
@@ -152,25 +152,19 @@ class ThirdRegisterController: UIViewController, UITextFieldDelegate, UIImagePic
         return img
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        info1.delegate = self
-        info2.delegate = self
-        nameTextField.delegate = self
-        registerStyle.layer.borderColor = UIColor(red: 25/255, green: 148/255, blue: 117/255, alpha: 0.8).cgColor
-        registerStyle.layer.borderWidth = 2
-        registerStyle.layer.cornerRadius = 12;
-        registerStyle.layer.masksToBounds = true
-        progress.transform = CGAffineTransform.init(scaleX: 1.0, y: 3.0)
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
     
+    //下一步按钮响应函数
     @IBAction func registerAction(_ sender: UIButton) {
+        //state代表注册进度
         if self.state == -1{
+            //输入完整性检查
+            if(nameTextField.text == nil){
+                errorInfoLabel.isHidden=false
+                errorInfoLabel.text = "请输入昵称！"
+                return
+            }
+            //完成头像选取
+            errorInfoLabel.isHidden = true
             headImageView.isHidden = true
             state = 0
             newUser.name = nameTextField.text!
@@ -178,6 +172,14 @@ class ThirdRegisterController: UIViewController, UITextFieldDelegate, UIImagePic
             return
         }
         if self.state == 0{
+            //输入完整性检查
+            if(info1.text == nil||info2.text == nil){
+                errorInfoLabel.isHidden=false
+                errorInfoLabel.text = "请填写用户名/密码！"
+                return
+            }
+            //完成用户名密码输入
+            errorInfoLabel.isHidden = true
             newUser.userName = info1.text!
             password = info2.text!
             labelMain.text = "请输入您的健康信息"
@@ -195,6 +197,13 @@ class ThirdRegisterController: UIViewController, UITextFieldDelegate, UIImagePic
             
         }
         if self.state == 1{
+            if(info1.text == nil||info2.text == nil){
+                errorInfoLabel.isHidden=false
+                errorInfoLabel.text = "请完整填写健康信息！"
+                return
+            }
+            //完成健康信息输入
+            errorInfoLabel.isHidden = true
             self.state = 2
             newUser.height = (info1.text! as NSString).intValue
             newUser.weight = (info2.text! as NSString).intValue
@@ -204,6 +213,7 @@ class ThirdRegisterController: UIViewController, UITextFieldDelegate, UIImagePic
             return
         }
         if self.state == 2{
+            //完成性别和生日信息输入
             self.state = 3
             newUser.gender = genderSelect.selectedSegmentIndex == 0 ? true : false
             newUser.birthday = birthdayCalendar.date
@@ -213,19 +223,17 @@ class ThirdRegisterController: UIViewController, UITextFieldDelegate, UIImagePic
             return
         }
         if self.state == 3{
-            
-            if true{
-                self.performSegue(withIdentifier: "registerToLogin", sender: nil)
-            }else{
-                let alertController = UIAlertController(title: "系统提示",message: "验证码错误", preferredStyle: .alert)
-                let cancelAction = UIAlertAction(title: "确定", style: .cancel, handler: nil)
-                alertController.addAction(cancelAction)
-                self.present(alertController, animated: true, completion: nil)
-                identityTextField.text = ""
+            if(emailTextField.text == nil){
+                errorInfoLabel.isHidden=false
+                errorInfoLabel.text = "请填写电子邮件地址！"
+                return
             }
+            DispatchQueue.main.async(execute: {
+                self.confirmEmail()
+            })
         }
     }
-    
+    //返回登陆界面
     @IBAction func registerBack(_ sender: UIButton) {
         self.performSegue(withIdentifier: "registerToLogin", sender: self)
     }
@@ -241,7 +249,6 @@ class ThirdRegisterController: UIViewController, UITextFieldDelegate, UIImagePic
         }
         sender.cancelsTouchesInView = false
     }
-
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
@@ -253,10 +260,12 @@ class ThirdRegisterController: UIViewController, UITextFieldDelegate, UIImagePic
   
     //邮件发送响应按钮
     @IBAction func sendEmailButton(_ sender: Any) {
-        //registerToserver()
-        //uploadImage()
-        //sendEmail()
-        sendButton.setTitle("重新发送", for: .normal)
+        waitCircle.startAnimating()
+        DispatchQueue.main.async(execute: {
+            self.registerToserver()
+            self.uploadImage()
+            self.sendEmail()
+        })
     }
     @IBAction func keyBoardReturn(_ sender: Any) {
         self.view.endEditing(true)
@@ -298,13 +307,20 @@ class ThirdRegisterController: UIViewController, UITextFieldDelegate, UIImagePic
             let dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in
                 if (error != nil) {
                     NSLog(error.debugDescription)
+                    DispatchQueue.main.async(execute: {
+                        self.errorInfoLabel.text = "网络异常"
+                        self.errorInfoLabel.isHidden = false
+                        self.waitCircle.stopAnimating()
+                    })
                 } else {
                     let json = try?JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.allowFragments) as AnyObject
                     let status = json?.object(forKey: "result") as! String
                     if status != "True"{
-                        let alertController = UIAlertController(title: "Warning",message: status, preferredStyle: .alert)
-                        let cancelAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
-                        alertController.addAction(cancelAction)
+                        DispatchQueue.main.async(execute: {
+                            self.errorInfoLabel.text = "网络异常"
+                            self.errorInfoLabel.isHidden = false
+                            self.waitCircle.stopAnimating()
+                        })
                     }
                 }
             })
@@ -340,13 +356,25 @@ class ThirdRegisterController: UIViewController, UITextFieldDelegate, UIImagePic
             let dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in
                 if (error != nil) {
                     NSLog(error.debugDescription)
+                    DispatchQueue.main.async(execute: {
+                        self.errorInfoLabel.text = "邮件发送失败"
+                        self.errorInfoLabel.isHidden = false
+                        self.waitCircle.stopAnimating()
+                    })
                 } else {
                     let json = try?JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.allowFragments) as AnyObject
                     let status = json?.object(forKey: "result") as! String
                     if status != "True"{
-                        let alertController = UIAlertController(title: "Warning",message: status, preferredStyle: .alert)
-                        let cancelAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
-                        alertController.addAction(cancelAction)
+                        DispatchQueue.main.async(execute: {
+                            self.errorInfoLabel.text = "邮件发送失败"
+                            self.errorInfoLabel.isHidden = false
+                            self.waitCircle.stopAnimating()
+                        })
+                    }else{
+                        DispatchQueue.main.async(execute: {
+                            self.sendButton.setTitle("重新发送", for: .normal)
+                            self.waitCircle.stopAnimating()
+                        })
                     }
                 }
             })
@@ -357,8 +385,7 @@ class ThirdRegisterController: UIViewController, UITextFieldDelegate, UIImagePic
         }
     }
     //验证邮箱
-    func confirmEmail() -> Int{
-        var result = 1
+    func confirmEmail(){
         let headers = [
             "authorization": "Basic eGp5OjIwMTcwNzI0",
             "content-type": "application/json",
@@ -384,14 +411,23 @@ class ThirdRegisterController: UIViewController, UITextFieldDelegate, UIImagePic
             let dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in
                 if (error != nil) {
                     NSLog(error.debugDescription)
+                    DispatchQueue.main.async(execute: {
+                        self.errorInfoLabel.text = "网络异常"
+                        self.errorInfoLabel.isHidden = false
+                    })
                 } else {
                     let json = try?JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.allowFragments) as AnyObject
                     let status = json?.object(forKey: "result") as! String
                     if status != "True"{
-                        let alertController = UIAlertController(title: "Warning",message: "验证码错误", preferredStyle: .alert)
-                        let cancelAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
-                        alertController.addAction(cancelAction)
-                        result = 0
+                        DispatchQueue.main.async(execute: {
+                            self.errorInfoLabel.text = "验证码错误"
+                            self.errorInfoLabel.isHidden = false
+                            self.identityTextField.text = ""
+                        })
+                    }else{
+                        DispatchQueue.main.async(execute: {
+                            self.performSegue(withIdentifier: "registerToLogin", sender: nil)
+                        })
                     }
                 }
             })
@@ -400,9 +436,8 @@ class ThirdRegisterController: UIViewController, UITextFieldDelegate, UIImagePic
         catch let error{
             NSLog("JSON失败\(error)")
         }
-        return result
     }
-    //上传图片
+    //讲头像图片上传到服务器
     func uploadImage(){
         let data=UIImagePNGRepresentation(newUser.headImage)//把图片转成data
         let uploadurl:String="http://www.sgmy.site/api/v2.0/uploadimage"//设置服务器接收地址
@@ -427,13 +462,41 @@ class ThirdRegisterController: UIViewController, UITextFieldDelegate, UIImagePic
             (response, data, error) ->Void in
             if (error != nil){
                 NSLog("NetWork Unconnected")
+                DispatchQueue.main.async(execute: {
+                    self.errorInfoLabel.text = "网络异常"
+                    self.errorInfoLabel.isHidden = false
+                    self.waitCircle.stopAnimating()
+                })
             }else{
                 let json = try?JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.allowFragments) as AnyObject
                 let status = json?.object(forKey: "result") as! Int
                 if status == 0{
                     NSLog("Upload Failed")
+                    DispatchQueue.main.async(execute: {
+                        self.errorInfoLabel.text = "网络异常"
+                        self.errorInfoLabel.isHidden = false
+                        self.waitCircle.stopAnimating()
+                    })
                 }
             }
         })
+    }
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        info1.delegate = self
+        info2.delegate = self
+        nameTextField.delegate = self
+        errorInfoLabel.isHidden = true
+        waitCircle.stopAnimating()
+        registerStyle.layer.borderColor = UIColor(red: 25/255, green: 148/255, blue: 117/255, alpha: 0.8).cgColor
+        registerStyle.layer.borderWidth = 2
+        registerStyle.layer.cornerRadius = 12;
+        registerStyle.layer.masksToBounds = true
+        progress.transform = CGAffineTransform.init(scaleX: 1.0, y: 3.0)
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
     }
 }
